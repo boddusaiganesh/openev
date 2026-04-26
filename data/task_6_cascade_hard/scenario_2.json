@@ -1,0 +1,390 @@
+{
+  "scenario_id": "cascade_hard_2",
+  "company_name": "Helix Biotech Corp.",
+  "industry": "Pharmaceutical / Biotech",
+  "initial_cash": 6000000.0,
+  "survival_target_days": 30,
+  "initial_ar": 2500000.0,
+  "initial_ap": 800000.0,
+  "credit_facility": 3000000.0,
+  "debt_covenant_min_cash": 2000000.0,
+  "contracts": [
+    {
+      "contract_id": "LICENSE-001",
+      "contract_type": "Exclusive Technology License Agreement",
+      "parties": ["Helix Biotech Corp.", "GeneStar Research Institute"],
+      "jurisdiction": "State of Massachusetts",
+      "effective_date": "2021-01-01",
+      "clauses": [
+        {
+          "clause_id": "LICENSE-001-ROYALTY",
+          "clause_type": "royalty_payment",
+          "text": "Helix shall pay quarterly royalties of 8% of net revenues to GeneStar. Failure to pay within 30 days of quarter end constitutes material breach and GeneStar may terminate the license with 15 days notice.",
+          "penalty_amount": 400000.0,
+          "deadline_days": 10,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "LICENSE-001-CHANGE",
+          "clause_type": "change_of_control",
+          "text": "A change of control of Helix (including acquisition of >30% equity) automatically terminates this license unless GeneStar provides written consent within 30 days.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "PHARMA-001",
+      "contract_type": "Commercial Supply Agreement",
+      "parties": ["Helix Biotech Corp.", "MedDistrib Inc."],
+      "jurisdiction": "State of New Jersey",
+      "effective_date": "2022-06-01",
+      "clauses": [
+        {
+          "clause_id": "PHARMA-001-DELIVERY",
+          "clause_type": "delivery_obligation",
+          "text": "Helix shall deliver 10,000 units per month. Failure triggers penalties of $30,000 per week of delay, plus MedDistrib's right to source substitute products at Helix's expense.",
+          "penalty_amount": 360000.0,
+          "deadline_days": 12,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "PHARMA-001-RECALL",
+          "clause_type": "product_recall",
+          "text": "In the event of a product recall, Helix shall bear all recall costs and indemnify MedDistrib for lost profits. Recall notice must be issued within 48 hours of regulatory directive.",
+          "penalty_amount": 800000.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "FDA-001",
+      "contract_type": "FDA Consent Decree",
+      "parties": ["Helix Biotech Corp.", "U.S. Food and Drug Administration"],
+      "jurisdiction": "Federal",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "FDA-001-REPORT",
+          "clause_type": "adverse_event_reporting",
+          "text": "Helix must submit an adverse event report (MedWatch 3500A) within 15 calendar days of receiving information about a serious and unexpected adverse drug reaction.",
+          "penalty_amount": 250000.0,
+          "deadline_days": 8,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "FDA-001-RECALL",
+          "clause_type": "recall_directive",
+          "text": "Upon FDA directive, Helix must issue a Class I recall within 24 hours and provide public notification within 48 hours.",
+          "penalty_amount": 500000.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "LOAN-003",
+      "contract_type": "Term Loan Agreement",
+      "parties": ["Helix Biotech Corp.", "BioCapital Ventures LLC"],
+      "jurisdiction": "State of New York",
+      "effective_date": "2021-06-01",
+      "clauses": [
+        {
+          "clause_id": "LOAN-003-COVENANT",
+          "clause_type": "financial_covenant",
+          "text": "Borrower shall maintain minimum cash of $2,000,000. Recall events or product liability judgments exceeding $500,000 constitute Material Adverse Change events triggering loan acceleration.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "LOAN-003-WAIVER",
+          "clause_type": "waiver",
+          "text": "BioCapital may grant a Material Adverse Change waiver upon written request. Request must be submitted within 5 days of the triggering event.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "INS-005",
+      "contract_type": "Product Liability Insurance Policy",
+      "parties": ["Helix Biotech Corp.", "Meridian Re Insurance"],
+      "jurisdiction": "State of New York",
+      "effective_date": "2021-01-01",
+      "clauses": [
+        {
+          "clause_id": "INS-005-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Product liability claims must be reported within 72 hours of learning of the triggering event. Coverage limit: $5,000,000.",
+          "penalty_amount": 0.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "INS-005-VOID",
+          "clause_type": "coverage_exclusion",
+          "text": "Coverage is void if Helix was aware of the product defect prior to the policy renewal date (January 1) and did not disclose it to the insurer.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "EMPLOY-002",
+      "contract_type": "Chief Scientific Officer Employment Agreement",
+      "parties": ["Helix Biotech Corp.", "Dr. Marcus Osei (CSO)"],
+      "jurisdiction": "State of Massachusetts",
+      "effective_date": "2020-01-01",
+      "clauses": [
+        {
+          "clause_id": "EMPLOY-002-KEYMAN",
+          "clause_type": "key_person",
+          "text": "GeneStar's license agreement (LICENSE-001) requires Dr. Osei's continued involvement as Principal Investigator. His departure triggers GeneStar's right to terminate the license within 30 days.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "EMPLOY-002-RETENTION",
+          "clause_type": "retention_bonus",
+          "text": "Dr. Osei is entitled to a crisis retention bonus of $300,000 payable within 10 days of any FDA recall directive, conditional on his continued employment.",
+          "penalty_amount": 300000.0,
+          "deadline_days": 10,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "FDA-001",
+      "source_clause_id": "FDA-001-RECALL",
+      "target_contract": "PHARMA-001",
+      "target_clause_id": "PHARMA-001-RECALL",
+      "edge_type": "cascade_trigger",
+      "description": "FDA recall directive triggers MedDistrib recall notice obligation within 48 hours. Costs stack: FDA recall costs + MedDistrib indemnification ($800K).",
+      "discovered": false
+    },
+    {
+      "source_contract": "PHARMA-001",
+      "source_clause_id": "PHARMA-001-RECALL",
+      "target_contract": "LOAN-003",
+      "target_clause_id": "LOAN-003-COVENANT",
+      "edge_type": "cascade_trigger",
+      "description": "Product recall indemnification ($800K) constitutes a Material Adverse Change triggering loan acceleration by BioCapital — waiver request must be filed within 5 days.",
+      "discovered": false
+    },
+    {
+      "source_contract": "EMPLOY-002",
+      "source_clause_id": "EMPLOY-002-KEYMAN",
+      "target_contract": "LICENSE-001",
+      "target_clause_id": "LICENSE-001-CHANGE",
+      "edge_type": "condition_precedent",
+      "description": "If Dr. Osei departs (triggered by non-payment of retention bonus by Day 10), GeneStar activates the key-person clause to terminate LICENSE-001, removing Helix's core IP rights.",
+      "discovered": false
+    },
+    {
+      "source_contract": "INS-005",
+      "source_clause_id": "INS-005-CLAIM",
+      "target_contract": "FDA-001",
+      "target_clause_id": "FDA-001-RECALL",
+      "edge_type": "condition_precedent",
+      "description": "Insurance must be claimed within 72h BEFORE Helix issues the public recall notice — any public admission before the insurance claim is filed risks triggering INS-005-VOID.",
+      "discovered": false
+    },
+    {
+      "source_contract": "LICENSE-001",
+      "source_clause_id": "LICENSE-001-ROYALTY",
+      "target_contract": "EMPLOY-002",
+      "target_clause_id": "EMPLOY-002-KEYMAN",
+      "edge_type": "supersession",
+      "description": "If GeneStar terminates the license due to royalty default, the key-person clause in EMPLOY-002 is simultaneously triggered because Dr. Osei's PI role ceases to exist.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "CP-017",
+      "name": "GeneStar Research Institute",
+      "role": "licensor",
+      "profile": "opportunistic",
+      "relationship_health": 0.7,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-018",
+      "name": "MedDistrib Inc.",
+      "role": "distribution_partner",
+      "profile": "aggressive",
+      "relationship_health": 0.8,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-019",
+      "name": "BioCapital Ventures LLC",
+      "role": "primary_lender",
+      "profile": "aggressive",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-020",
+      "name": "Meridian Re Insurance",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "DL-019",
+      "description": "File product liability claim with Meridian Re Insurance (72-hour window — MUST be before public recall notice)",
+      "contract_id": "INS-005",
+      "clause_id": "INS-005-CLAIM",
+      "due_day": 3,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Missing this forfeits $5M insurance coverage AND must come before public recall notice."
+    },
+    {
+      "deadline_id": "DL-020",
+      "description": "Issue FDA Class I Recall public notification (48-hour window after directive)",
+      "contract_id": "FDA-001",
+      "clause_id": "FDA-001-RECALL",
+      "due_day": 2,
+      "penalty_if_missed": 500000.0,
+      "status": "active",
+      "consequence_description": "$500K FDA penalty + potential criminal liability for executives."
+    },
+    {
+      "deadline_id": "DL-021",
+      "description": "Send MedDistrib recall notice and indemnification acknowledgment (48-hour window)",
+      "contract_id": "PHARMA-001",
+      "clause_id": "PHARMA-001-RECALL",
+      "due_day": 2,
+      "penalty_if_missed": 800000.0,
+      "status": "active",
+      "consequence_description": "$800K recall indemnification + MedDistrib termination right."
+    },
+    {
+      "deadline_id": "DL-022",
+      "description": "Submit FDA Adverse Event Report MedWatch 3500A (8-day window)",
+      "contract_id": "FDA-001",
+      "clause_id": "FDA-001-REPORT",
+      "due_day": 8,
+      "penalty_if_missed": 250000.0,
+      "status": "active",
+      "consequence_description": "$250K FDA fine and consent decree violation."
+    },
+    {
+      "deadline_id": "DL-023",
+      "description": "Request BioCapital Material Adverse Change waiver (5-day window)",
+      "contract_id": "LOAN-003",
+      "clause_id": "LOAN-003-WAIVER",
+      "due_day": 5,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Without waiver, BioCapital accelerates $3M loan repayment — immediate bankruptcy risk."
+    },
+    {
+      "deadline_id": "DL-024",
+      "description": "Pay royalties to GeneStar Research Institute (10-day window)",
+      "contract_id": "LICENSE-001",
+      "clause_id": "LICENSE-001-ROYALTY",
+      "due_day": 10,
+      "penalty_if_missed": 400000.0,
+      "status": "active",
+      "consequence_description": "Non-payment triggers license termination + Dr. Osei key-person clause + $400K penalty."
+    },
+    {
+      "deadline_id": "DL-025",
+      "description": "Pay Dr. Osei crisis retention bonus ($300K by Day 10)",
+      "contract_id": "EMPLOY-002",
+      "clause_id": "EMPLOY-002-RETENTION",
+      "due_day": 10,
+      "penalty_if_missed": 5000000.0,
+      "status": "active",
+      "consequence_description": "Non-payment triggers Dr. Osei departure -> GeneStar license termination -> loss of all IP rights ($5M+ exposure)."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "SHOCK-008",
+      "category": "regulatory",
+      "title": "FDA Class I Recall Directive — Fatal Adverse Reactions Reported",
+      "description": "The FDA has issued a Class I recall directive for Helix's flagship drug HelixPro-7 following 3 reported patient deaths. You have 24 hours to issue recall, 48 hours for public notification, and 72 hours to file insurance. CRITICAL: the insurance claim MUST be filed before any public recall notice — public admission before claim filing may void coverage under INS-005-VOID. Cross-reference all 6 contracts. A recall cascades to MedDistrib indemnification ($800K) which triggers BioCapital Material Adverse Change. Non-payment of Dr. Osei's $300K retention bonus by Day 10 loses the license entirely.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -100000.0,
+      "triggered_obligations": ["FDA-001-RECALL", "PHARMA-001-RECALL", "INS-005-CLAIM"]
+    },
+    {
+      "shock_id": "SHOCK-009",
+      "category": "reputational",
+      "title": "Investigative Report — GeneStar Seeking Alternative Licensee",
+      "description": "On Day 16, a pharmaceutical industry publication reports that GeneStar Research Institute is in talks with a competitor to license the HelixPro technology. GeneStar's opportunistic profile means they may use the recall crisis as grounds to terminate LICENSE-001 unless relationship is actively managed. BioCapital is also watching closely.",
+      "occurs_on_day": 16,
+      "immediate_cash_impact": -50000.0,
+      "triggered_obligations": ["LICENSE-001-CHANGE"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "MSG-014",
+      "day_received": 1,
+      "sender": "U.S. Food and Drug Administration",
+      "subject": "URGENT: Class I Recall Directive — HelixPro-7 (NDA #204821)",
+      "body": "Pursuant to 21 CFR Part 7, the FDA hereby directs Helix Biotech Corp. to initiate a Class I recall of HelixPro-7 (Lot Numbers: HP7-2024-001 through HP7-2024-047). Three fatalities have been reported with a probable causal link. You must: (1) Issue recall notice within 24 hours, (2) Provide public notification within 48 hours, (3) Submit MedWatch 3500A within 15 days. Non-compliance constitutes a federal misdemeanor.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 1,
+      "read": false
+    },
+    {
+      "message_id": "MSG-015",
+      "day_received": 1,
+      "sender": "Medical Affairs & Chief Scientific Officer",
+      "subject": "HelixPro-7 Recall — CSO Assessment",
+      "body": "Dr. Osei has reviewed the adverse event reports. The deaths appear linked to a manufacturing contamination in Lot HP7-2024-031 through HP7-2024-039. We believe our insurance covers this. However, we must file the insurance claim BEFORE issuing any public recall statement that admits liability. I recommend an emergency board call. Note: My retention agreement requires a $300K crisis bonus — please confirm this will be honored.",
+      "is_legal_notice": false,
+      "requires_response_by_day": null,
+      "read": false
+    },
+    {
+      "message_id": "MSG-016",
+      "day_received": 2,
+      "sender": "MedDistrib Inc. Legal",
+      "subject": "HelixPro-7 Recall — Formal Notice of Indemnification Claim",
+      "body": "MedDistrib Inc. has become aware of the FDA recall directive. Under Section 9.4 of our Supply Agreement, Helix is obligated to indemnify us for all costs, losses, and damages arising from this recall. We estimate our direct losses at $650,000. Please acknowledge this indemnification claim and confirm your insurer within 48 hours of this notice.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 3,
+      "read": false
+    },
+    {
+      "message_id": "MSG-017",
+      "day_received": 3,
+      "sender": "BioCapital Ventures LLC",
+      "subject": "Material Adverse Change — Covenant Monitoring",
+      "body": "We are aware of the FDA recall directive affecting Helix Biotech Corp. Under Section 12.3 of your Term Loan Agreement, a product recall constitutes a Material Adverse Change event. We are placing your account on watch status. Please provide a written response within 5 days confirming your financial position and requesting a formal waiver if required.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 5,
+      "read": false
+    }
+  ]
+}

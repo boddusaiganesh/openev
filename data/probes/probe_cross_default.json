@@ -1,0 +1,117 @@
+{
+  "probe_id": "probe_cross_default",
+  "failure_mode": "cross_default",
+  "description": "A judgment against the company in Contract A triggers a cross-default clause in Loan Contract B. Agent must assess_counterparty_risk and cross_reference before acting to discover this chain.",
+  "company_name": "ProbeTest Corp Delta",
+  "industry": "Real Estate Tech",
+  "initial_cash": 2500000.0,
+  "survival_target_days": 12,
+  "initial_ar": 600000.0,
+  "initial_ap": 150000.0,
+  "credit_facility": 1500000.0,
+  "debt_covenant_min_cash": 1000000.0,
+  "contracts": [
+    {
+      "contract_id": "PROBE-CLIENT-XD",
+      "contract_type": "Enterprise Software Agreement",
+      "parties": ["ProbeTest Corp Delta", "MegaCorp Ltd"],
+      "jurisdiction": "California",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-CLIENT-LD",
+          "clause_type": "liquidated_damages",
+          "text": "Failure to deliver the software platform by the contractual milestone date triggers liquidated damages of $600,000, which may be enforced by MegaCorp as a judgment without further notice.",
+          "penalty_amount": 600000.0,
+          "deadline_days": 7,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "PROBE-LOAN-XD",
+      "contract_type": "Revolving Credit Facility",
+      "parties": ["ProbeTest Corp Delta", "NationalBank"],
+      "jurisdiction": "New York",
+      "effective_date": "2022-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-LOAN-XDEF",
+          "clause_type": "cross_default",
+          "text": "Any judgment, award, or order against Borrower in excess of $500,000, or any default under any other material credit agreement, shall constitute a Cross-Default under this facility, entitling the Bank to accelerate all outstanding principal immediately.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "PROBE-CLIENT-XD",
+      "source_clause_id": "PROBE-CLIENT-LD",
+      "target_contract": "PROBE-LOAN-XD",
+      "target_clause_id": "PROBE-LOAN-XDEF",
+      "edge_type": "cascade_trigger",
+      "description": "MegaCorp enforcing the $600K LD judgment triggers the cross-default clause in the credit facility — bank can accelerate all debt immediately.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "PROBE-CP-005",
+      "name": "MegaCorp Ltd",
+      "role": "enterprise_client",
+      "profile": "litigious",
+      "relationship_health": 0.5,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "PROBE-CP-006",
+      "name": "NationalBank",
+      "role": "primary_lender",
+      "profile": "aggressive",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "PROBE-DL-003",
+      "description": "Negotiate with MegaCorp before LD judgment is enforced (Day 7)",
+      "contract_id": "PROBE-CLIENT-XD",
+      "clause_id": "PROBE-CLIENT-LD",
+      "due_day": 7,
+      "penalty_if_missed": 600000.0,
+      "status": "active",
+      "consequence_description": "$600K judgment triggers cross-default on credit facility — bank can accelerate all debt."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "PROBE-SHOCK-004",
+      "category": "financial",
+      "title": "Milestone Miss — MegaCorp Preparing $600K Judgment",
+      "description": "ProbeTest has missed a key software delivery milestone. MegaCorp is preparing to enforce $600K in liquidated damages as a court judgment. HIDDEN: if that judgment is entered, it triggers the cross-default clause in NationalBank's credit facility, allowing the bank to call all outstanding debt immediately. Agent must cross-reference contracts to discover this before MegaCorp acts.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -20000.0,
+      "triggered_obligations": ["PROBE-CLIENT-LD"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "PROBE-MSG-004",
+      "day_received": 1,
+      "sender": "MegaCorp Ltd Legal",
+      "subject": "Notice of Intent to Enforce Liquidated Damages — $600,000",
+      "body": "ProbeTest Corp Delta has failed to deliver the agreed platform by the contractual milestone date. Pursuant to Section 9.3, MegaCorp will seek enforcement of $600,000 in liquidated damages within 7 days unless delivery is made or a satisfactory remediation plan is agreed.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 5,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "cross_reference_done_before_judgment_enforced",
+  "probe_fail_condition": "judgment_enforced_triggering_cross_default"
+}

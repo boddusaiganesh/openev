@@ -1,0 +1,124 @@
+{
+  "probe_id": "probe_key_person_chain",
+  "failure_mode": "key_person_chain",
+  "description": "Three-hop dependency: non-payment of retention bonus -> key person departs -> license termination ->  termination liability. Agent must discover the chain via cross-referencing.",
+  "company_name": "ProbeTest Corp Zeta",
+  "industry": "Biotech",
+  "initial_cash": 3000000.0,
+  "survival_target_days": 15,
+  "initial_ar": 400000.0,
+  "initial_ap": 100000.0,
+  "credit_facility": 1000000.0,
+  "debt_covenant_min_cash": 800000.0,
+  "contracts": [
+    {
+      "contract_id": "KP-EMPLOY",
+      "contract_type": "Employment Agreement",
+      "parties": [
+        "ProbeTest Corp Zeta",
+        "Dr. Key Person"
+      ],
+      "jurisdiction": "MA",
+      "effective_date": "2020-01-01",
+      "clauses": [
+        {
+          "clause_id": "KP-BONUS",
+          "clause_type": "retention_bonus",
+          "text": "Dr. Key Person is entitled to a ,000 retention bonus due by Day 10.",
+          "penalty_amount": 150000.0,
+          "deadline_days": 10,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "KP-KEYMAN",
+          "clause_type": "key_person",
+          "text": "The IP License (KP-LICENSE) requires Dr. Key Person as Principal Investigator. Departure triggers licensor termination right within 15 days.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "KP-LICENSE",
+      "contract_type": "IP License Agreement",
+      "parties": [
+        "ProbeTest Corp Zeta",
+        "ResearchInstitute"
+      ],
+      "jurisdiction": "MA",
+      "effective_date": "2021-01-01",
+      "clauses": [
+        {
+          "clause_id": "KP-LICENSE-TERM",
+          "clause_type": "termination",
+          "text": "ResearchInstitute may terminate the license if the Principal Investigator departs. Termination penalty: ,000,000.",
+          "penalty_amount": 3000000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "KP-EMPLOY",
+      "source_clause_id": "KP-KEYMAN",
+      "target_contract": "KP-LICENSE",
+      "target_clause_id": "KP-LICENSE-TERM",
+      "edge_type": "condition_precedent",
+      "description": "Dr. Key Person departure (triggered by non-payment of bonus) gives ResearchInstitute right to terminate license \u2014  penalty.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "KP-CP-001",
+      "name": "ResearchInstitute",
+      "role": "licensor",
+      "profile": "opportunistic",
+      "relationship_health": 0.7,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "KP-DL-001",
+      "description": "Pay Dr. Key Person retention bonus  by Day 10",
+      "contract_id": "KP-EMPLOY",
+      "clause_id": "KP-BONUS",
+      "due_day": 10,
+      "penalty_if_missed": 3000000.0,
+      "status": "active",
+      "consequence_description": "Non-payment triggers departure -> license termination ->  penalty."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "KP-SHOCK",
+      "category": "financial",
+      "title": "Cash Pressure \u2014 Multiple Obligations Competing",
+      "description": "Company is under cash pressure. Several obligations are competing. HIDDEN: Dr. Key Person retention bonus of  is due Day 10. Missing it costs  through a 3-hop dependency chain. Agent must cross-reference employment and license contracts to discover this.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -100000.0,
+      "triggered_obligations": []
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "KP-MSG",
+      "day_received": 1,
+      "sender": "CFO Office",
+      "subject": "Cash Flow Review \u2014 Prioritise Payments",
+      "body": "We are reviewing all outstanding payment obligations to prioritise cash deployment. Please advise on which obligations are critical. Note: Dr. Key Person has mentioned his retention bonus timeline in a recent email. Suggest reviewing all employment and license contracts.",
+      "is_legal_notice": false,
+      "requires_response_by_day": null,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "bonus_paid_before_day_10",
+  "probe_fail_condition": "bonus_missed_triggering_license_termination"
+}

@@ -1,0 +1,100 @@
+{
+  "contract_meta": {
+    "contract_type": "Strategic Partnership Agreement",
+    "parties": ["CloudScale Technologies", "Enterprise Holdings Corp"],
+    "jurisdiction": "State of Colorado",
+    "effective_date": "2024-08-01"
+  },
+  "clauses": [
+    {
+      "text": "Each party shall own all right, title, and interest in and to its pre-existing intellectual property, and no license or right to use such pre-existing IP is granted herein unless expressly provided.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["pre-existing intellectual property", "ownership", "license"],
+      "difficulty_note": "Clear IP ownership boundaries"
+    },
+    {
+      "text": "Partner shall pay Company a royalty equal to fifteen percent of all net revenues derived from products incorporating Company's technology. Royalties shall be paid quarterly within thirty days of the end of each calendar quarter.",
+      "clause_type": "payment_terms",
+      "risk_level": "medium",
+      "issues": ["missing_time_limit"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["royalty", "fifteen percent", "net revenues", "quarterly"],
+      "difficulty_note": "Royalty rate is high; no cap on total royalties"
+    },
+    {
+      "text": "COMPANY SHALL NOT BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF BUSINESS, OR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR EXEMPLARY DAMAGES ARISING OUT OF OR RELATED TO THIS AGREEMENT, REGARDLESS OF WHETHER COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.",
+      "clause_type": "limitation_of_liability",
+      "risk_level": "critical",
+      "issues": ["missing_liability_cap", "one_sided_obligation"],
+      "recommended_action": "escalate_to_senior_counsel",
+      "reasoning_keywords": ["shall not be liable", "loss of profits", "consequential damages"],
+      "difficulty_note": "Very broad exclusion; conflicts with indemnification"
+    },
+    {
+      "text": "Company shall indemnify, defend, and hold harmless Partner from and against any claims, damages, losses, and expenses arising from Company's gross negligence or willful misconduct in connection with this Agreement.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["missing_carve_out"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "gross negligence", "willful misconduct"],
+      "difficulty_note": "Should include standard carve-outs for ordinary negligence"
+    },
+    {
+      "text": "Either party may terminate this Agreement: (a) for convenience upon one hundred eighty days prior written notice, (b) immediately upon material breach that remains uncured for sixty days after written notice, or (c) immediately upon insolvency of the other party.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["terminate", "convenience", "material breach", "insolvency"],
+      "difficulty_note": "Balanced termination rights"
+    },
+    {
+      "text": "During the term and for a period of three years thereafter, Partner shall not directly or indirectly own, manage, operate, join, control, or participate in any business that competes with Company's cloud infrastructure services anywhere Company operates.",
+      "clause_type": "non_compete",
+      "risk_level": "high",
+      "issues": ["overly_broad_scope", "ambiguous_definition"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["competes", "cloud infrastructure", "three years"],
+      "difficulty_note": "Non-compete is overly broad geographically and temporally"
+    },
+    {
+      "text": "Company shall maintain the following insurance: (a) Commercial General Liability with limits of $1,000,000 per occurrence, (b) Professional Liability with limits of $2,000,000 per claim, and (c) Cyber Liability with limits of $5,000,000. All policies shall name Partner as additional insured.",
+      "clause_type": "insurance",
+      "risk_level": "medium",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["insurance", "additional insured", "$5,000,000", "Cyber Liability"],
+      "difficulty_note": "Comprehensive insurance requirements"
+    },
+    {
+      "text": "The parties agree to maintain in strict confidence all Confidential Information disclosed by either party and to use such information solely for purposes of this Agreement. Each party shall protect the other's Confidential Information using at least the same degree of care it uses to protect its own confidential information.",
+      "clause_type": "confidentiality",
+      "risk_level": "medium",
+      "issues": ["vague_language"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["Confidential Information", "strict confidence", "at least the same degree of care"],
+      "difficulty_note": "Standard of care is vague; should specify minimum protections"
+    },
+    {
+      "text": "This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, and agreements relating to the subject matter. No waiver, amendment, or modification shall be effective unless in writing and signed by both parties.",
+      "clause_type": "representations",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["entire agreement", "supersedes", "amendment", "in writing"],
+      "difficulty_note": "Standard integration clause"
+    },
+    {
+      "text": "Any dispute arising out of or related to this Agreement shall be resolved exclusively by binding arbitration in Denver, Colorado under the rules of the American Arbitration Association. The prevailing party shall be entitled to recover reasonable attorneys' fees and costs.",
+      "clause_type": "dispute_resolution",
+      "risk_level": "high",
+      "issues": ["one_sided_obligation"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["arbitration", "Denver", "American Arbitration Association", "prevailing party"],
+      "difficulty_note": "Prevailing party fees may discourage legitimate claims"
+    }
+  ]
+}

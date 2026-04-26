@@ -1,0 +1,396 @@
+# =============================================================================
+# LexArena — Complete Legal Intelligence Benchmark
+# OpenEnv Specification v3.0.0
+#
+# Single HF Space entry point: lexarena_server.py on port 7860
+# All 6 tiers, adversarial probes, and Legal IQ served from one process.
+# =============================================================================
+
+name: lexarena
+version: "3.0.0"
+description: >
+  LexArena is the first benchmark to evaluate AI agents across the complete
+  legal intelligence stack — from verbatim clause extraction to 30-day
+  corporate crisis survival — using a six-tier framework with a fully
+  deterministic composite Legal IQ score. No LLM-as-judge anywhere.
+
+  TIER 1 — Clause Reading Comprehension (CUAD, 15%)
+  TIER 2 — Risk Classification / Full Contract Review (OpenEnv, 15%)
+  TIER 3 — Dependency Graph Mapping (novel, 20%)
+  TIER 4 — Single-Cascade Crisis (LexDomino Easy, 12.5%)
+  TIER 5 — Multi-Document Crisis (LexDomino Medium, 17.5%)
+  TIER 6 — Full Systemic Cascade (LexDomino Hard, 20%)
+
+  Composite: Legal IQ = 0.15·T1 + 0.15·T2 + 0.20·T3 + 0.50·(0.25·T4 + 0.35·T5 + 0.40·T6)
+
+author: LexArena Benchmark Team
+license: MIT
+tags:
+  - lexarena
+  - openenv
+  - legal-ai
+  - contract-review
+  - crisis-management
+  - systemic-risk
+  - benchmark
+  - cuad
+
+# =============================================================================
+# SERVER — single unified entry point for the HF Space
+# =============================================================================
+server:
+  port: 7860
+  host: "0.0.0.0"
+  implementation: lexarena_server.py
+  endpoints:
+    health:     GET  /health
+    root_spec:  GET  /
+    curriculum: GET  /curriculum
+
+    # Tier 1 — Clause Extraction (CUAD)
+    tier1_reset: POST /tier1/reset
+    tier1_step:  POST /tier1/step
+
+    # Tier 2 — Clause Review (OpenEnv Tasks 1-3)
+    tier2_reset: POST /reset        # backward-compatible with original OpenEnv
+    tier2_step:  POST /step
+    tier2_state: GET  /state
+
+    # Tier 3 — Dependency Graph Mapping
+    tier3_reset: POST /tier3/reset
+    tier3_step:  POST /tier3/step
+
+    # Tiers 4-6 — LexDomino Crisis (backward-compatible cascade paths)
+    cascade_reset:     POST /cascade/reset
+    cascade_step:      POST /cascade/step
+    cascade_state:     GET  /cascade/state
+    cascade_actions:   GET  /cascade/actions
+    cascade_deadlines: GET  /cascade/deadlines
+    cascade_metrics:   GET  /cascade/metrics
+
+    # Legal IQ Aggregation
+    legal_iq_compute:    POST /legal_iq
+    legal_iq_leaderboard: GET /legal_iq/leaderboard
+
+    # Adversarial Probes
+    probes_list: GET  /probes
+    probe_run:   POST /probes/run
+
+# =============================================================================
+# TASKS
+# =============================================================================
+tasks:
+
+  # --- Tier 1: Clause Reading Comprehension ---
+  - id: tier1_clause_reading
+    name: "Tier 1 — Clause Reading Comprehension"
+    tier: 1
+    weight: 0.15
+    difficulty: extraction
+    data_source: CUAD
+    description: >
+      Given a contract clause and a question category (e.g. "Force Majeure"),
+      extract the verbatim sentence that answers the question. If no clause
+      applies, respond exactly: "No related clause."
+      Tests precise legal language comprehension. F2-weighted (recall-heavy).
+    max_steps: 1
+    scoring:
+      primary: f2_score
+      secondary: jaccard_mean
+      tertiary: laziness_penalty
+      formula: "0.60·F2 + 0.25·Jaccard + 0.15·(1 - laziness_rate)"
+    endpoint_reset: /tier1/reset
+    endpoint_step:  /tier1/step
+
+  # --- Tier 2a: Easy — Clause Classification ---
+  - id: task_1_easy
+    name: "Tier 2a — Clause Classification (Easy)"
+    tier: 2
+    weight: 0.05
+    difficulty: easy
+    description: >
+      Classify each clause by type from a fixed taxonomy. Clauses are
+      unambiguous. Single-field output. Tests basic legal vocabulary.
+    max_steps: 10
+    scoring:
+      primary: label_accuracy
+    grader: graders.grade_episode
+    endpoint_reset: /reset
+    endpoint_step:  /step
+
+  # --- Tier 2b: Medium — Risk Assessment ---
+  - id: task_2_medium
+    name: "Tier 2b — Risk Assessment (Medium)"
+    tier: 2
+    weight: 0.05
+    difficulty: medium
+    description: >
+      Classify clause type, assign risk level, and flag specific issues.
+      Some clauses have non-obvious risks requiring careful reading.
+      Tests legal risk assessment.
+    max_steps: 20
+    scoring:
+      primary: weighted_label_accuracy
+    grader: graders.grade_episode
+    endpoint_reset: /reset
+    endpoint_step:  /step
+
+  # --- Tier 2c: Hard — Full Contract Review ---
+  - id: task_3_hard
+    name: "Tier 2c — Full Contract Review (Hard)"
+    tier: 2
+    weight: 0.05
+    difficulty: hard
+    description: >
+      Full review: type, risk, flags, action, reasoning, cross-clause
+      reasoning. Contains conflicting clauses and subtle traps.
+    max_steps: 40
+    scoring:
+      primary: weighted_label_accuracy
+    grader: graders.grade_episode
+    endpoint_reset: /reset
+    endpoint_step:  /step
+
+  # --- Tier 3: Dependency Graph Mapping ---
+  - id: tier3_dependency_mapping
+    name: "Tier 3 — Dependency Graph Mapping"
+    tier: 3
+    weight: 0.20
+    difficulty: novel
+    description: >
+      Given 3-5 contracts, proactively map all hidden cross-document
+      dependency edges before a crisis occurs. Output a structured graph.
+      No existing benchmark tests this. Ground truth from LexDomino scenarios.
+    max_steps: 10
+    scoring:
+      primary: recall
+      secondary: precision
+      formula: "0.50·recall + 0.25·precision + 0.15·edge_type_acc + 0.10·severity_order"
+    endpoint_reset: /tier3/reset
+    endpoint_step:  /tier3/step
+
+  # --- Tier 4: Single-Cascade Crisis (Easy) ---
+  - id: task_4_cascade_easy
+    name: "Tier 4 — Single-Cascade Crisis (Easy)"
+    tier: 4
+    weight: 0.125
+    difficulty: cascade_easy
+    environment: LexDomino
+    description: >
+      2-3 contracts, 15 days, cooperative counterparties, 0-1 hidden edges.
+      Tests basic deadline management and Force Majeure / insurance decisions.
+    max_steps: 15
+    survival_days: 15
+    scoring:
+      formula: "0.75·(cash_final/cash_initial) + 0.15·(deadlines_met/deadlines_total) + 0.10·(edges_found/edges_total)"
+    grader: cascade_graders.grade_cascade_episode
+    endpoint_reset: /cascade/reset
+    endpoint_step:  /cascade/step
+
+  # --- Tier 5: Multi-Document Crisis (Medium) ---
+  - id: task_5_cascade_medium
+    name: "Tier 5 — Multi-Document Crisis (Medium)"
+    tier: 5
+    weight: 0.175
+    difficulty: cascade_medium
+    environment: LexDomino
+    description: >
+      4-5 contracts, 30 days, mixed counterparties, 2-3 hidden dependency
+      edges. Tests cross-document reasoning and covenant management.
+    max_steps: 30
+    survival_days: 30
+    scoring:
+      formula: "0.75·(cash_final/cash_initial) + 0.15·(deadlines_met/deadlines_total) + 0.10·(edges_found/edges_total)"
+    grader: cascade_graders.grade_cascade_episode
+    endpoint_reset: /cascade/reset
+    endpoint_step:  /cascade/step
+
+  # --- Tier 6: Full Systemic Cascade (Hard / Frontier) ---
+  - id: task_6_cascade_hard
+    name: "Tier 6 — Full Systemic Cascade (Frontier)"
+    tier: 6
+    weight: 0.20
+    difficulty: cascade_hard
+    environment: LexDomino
+    description: >
+      5-6 contracts, 60 days, adversarial counterparties. Compound shocks
+      at Day 1 and Day 14-16. 4-5 hidden dependencies. Tests long-horizon
+      planning, anti-sycophancy, multi-objective optimization under crisis.
+    max_steps: 60
+    survival_days: 60
+    scoring:
+      formula: "0.75·(cash_final/cash_initial) + 0.15·(deadlines_met/deadlines_total) + 0.10·(edges_found/edges_total)"
+    grader: cascade_graders.grade_cascade_episode
+    endpoint_reset: /cascade/reset
+    endpoint_step:  /cascade/step
+
+# =============================================================================
+# LEGAL IQ COMPOSITE SCORE
+# =============================================================================
+legal_iq:
+  formula: "0.15·T1 + 0.15·T2 + 0.20·T3 + 0.50·(0.25·T4 + 0.35·T5 + 0.40·T6)"
+  rationale: >
+    Crisis management (50%) is weighted highest because strategic decision-making
+    under time pressure is the hard, generalizable skill — impossible to fake with
+    fine-tuning on legal text corpora alone.
+  labels:
+    - range: [0.85, 1.00]
+      label: "Expert CRO Level"
+    - range: [0.70, 0.84]
+      label: "Senior Lawyer Level"
+    - range: [0.50, 0.69]
+      label: "Junior Associate Level"
+    - range: [0.30, 0.49]
+      label: "Paralegal Level"
+    - range: [0.00, 0.29]
+      label: "Fails Legal Practice Bar"
+
+# =============================================================================
+# OBSERVATION SPACES
+# =============================================================================
+observation_space:
+
+  tier1:
+    type: object
+    fields:
+      sample_id: string
+      contract_name: string
+      question_category: string
+      context: string            # the contract clause text
+      question: string
+      has_answer: boolean
+      # Feedback (populated after step)
+      corrective_feedback: string (optional)
+
+  clause_review:                 # Tiers 2a/2b/2c
+    type: object
+    fields:
+      task_id: string
+      step_number: integer
+      max_steps: integer
+      clause_text: string
+      clause_index: integer
+      total_clauses: integer
+      contract_type: string
+      parties: list[string]
+      jurisdiction: string
+      instructions: string
+      available_actions: list[string]
+      last_action_feedback: string
+      corrective_feedback: string   # NEW: explains what was wrong and why
+      accumulated_score: float
+      done: boolean
+
+  tier3:
+    type: object
+    fields:
+      scenario_id: string
+      contracts: list[object]    # contract summaries with clause excerpts
+      steps_remaining: integer
+      edges_found_so_far: integer
+      last_feedback: string
+      corrective_feedback: string
+      done: boolean
+
+  cascade:                       # Tiers 4/5/6
+    type: object
+    fields:
+      task_id: string
+      current_day: integer
+      max_days: integer
+      step_number: integer
+      max_steps: integer
+      cash_balance: float
+      covenant_min_cash: float
+      covenant_violated: boolean
+      insurance_active: boolean
+      reputation_score: float
+      active_deadlines: list[object]
+      inbox_messages: list[object]
+      discovered_edges: list[object]
+      contracts_summary: list[object]
+      counterparty_statuses: list[object]
+      last_action_feedback: string
+      corrective_feedback: string   # NEW: explains consequence of last action
+      available_actions: list[string]
+      done: boolean
+      bankruptcy: boolean
+
+# =============================================================================
+# ACTION SPACES
+# =============================================================================
+action_space:
+
+  tier1:
+    type: object
+    fields:
+      extracted_text: string     # verbatim extraction or "No related clause."
+
+  clause_review:
+    type: object
+    fields:
+      action_type: string        # classify|rate_severity|flag|suggest|reason|next_clause|complete_review
+      clause_type: string        # optional, from taxonomy
+      risk_level: string         # optional, low|medium|high|critical
+      flags: list[string]        # optional, from issue flags
+      suggested_action: string   # optional, from suggested actions
+      reasoning: string          # optional, free text
+
+  tier3:
+    type: object
+    fields:
+      dependencies: list[object] # each: {source_contract, source_clause, target_contract, target_clause, edge_type, reasoning}
+
+  cascade:
+    type: object
+    fields:
+      action_type: string        # see cascade_models.CascadeActionType
+      contract_id: string        # optional
+      clause_id: string          # optional
+      counterparty_id: string    # optional
+      amount: float              # optional
+      justification: string      # optional
+      contract_ids: list[string] # optional, for cross_reference_contracts
+
+# =============================================================================
+# ADVERSARIAL PROBE SUITE
+# =============================================================================
+probes:
+  count: 10
+  endpoint_list: GET /probes
+  endpoint_run:  POST /probes/run
+  failure_modes:
+    - probe_fm_void:            "Invoking FM voids insurance (mutual exclusion)"
+    - probe_sycophancy:         "Paying legally time-barred demand"
+    - probe_covenant_blindness: "Missing debt covenant cascade"
+    - probe_cross_default:      "Missing cross-default chain"
+    - probe_deadline_stack:     "Failing to prioritise stacked deadlines"
+    - probe_key_person_chain:   "Missing 3-hop dependency chain"
+    - probe_false_urgency:      "Acting on non-binding letter of intent"
+    - probe_supersession:       "Missing addendum that overrides penalty"
+    - probe_compound_shock:     "Failing to handle simultaneous crises"
+    - probe_lazy_reader:        "Missing deadlines due to skipping investigation"
+
+# =============================================================================
+# CORRECTIVE FEEDBACK SYSTEM
+# =============================================================================
+corrective_feedback:
+  description: >
+    Every step response includes a `corrective_feedback` field. This is NOT
+    the grader score. It is a human-readable explanation of:
+      (a) What the correct answer was for this step
+      (b) WHY the agent's answer was wrong (if it was)
+      (c) The legal principle violated or upheld
+
+    This transforms LexArena from a pure benchmark into a learning environment.
+    Lightweight models benefit most: they receive explicit legal reasoning at
+    every step, which primes future steps in the same episode.
+
+  format: string (1-3 sentences, written as expert legal feedback)
+  examples:
+    - tier: 2
+      scenario: "Agent classified 'Each party shall indemnify...' as limitation_of_liability"
+      feedback: "Incorrect. Mutual indemnification clauses are classified as 'indemnification', not 'limitation_of_liability'. Limitation clauses cap the total liability amount; indemnification clauses define who bears the cost of third-party claims."
+    - tier: 6
+      scenario: "Agent invoked Force Majeure before filing insurance claim"
+      feedback: "Critical error. The insurance policy (Contract B, Section 5) contains an exclusion clause: coverage is void if Force Majeure has been invoked on the same triggering event. The correct sequence was: file insurance (Day 1-2) THEN invoke FM (Day 1-5). You forfeited $1.5M coverage."

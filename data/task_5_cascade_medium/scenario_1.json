@@ -1,0 +1,270 @@
+{
+  "scenario_id": "cascade_medium_1",
+  "company_name": "Axiom Data Systems Inc.",
+  "industry": "Cloud Data Services / SaaS",
+  "initial_cash": 3500000.0,
+  "survival_target_days": 20,
+  "initial_ar": 800000.0,
+  "initial_ap": 250000.0,
+  "credit_facility": 1000000.0,
+  "debt_covenant_min_cash": 1000000.0,
+  "contracts": [
+    {
+      "contract_id": "MSA-002",
+      "contract_type": "Master Service Agreement",
+      "parties": ["Axiom Data Systems Inc.", "EuroCorp GmbH"],
+      "jurisdiction": "Delaware",
+      "effective_date": "2023-06-01",
+      "clauses": [
+        {
+          "clause_id": "MSA-002-DPA",
+          "clause_type": "data_protection",
+          "text": "Axiom shall notify EuroCorp of any personal data breach within 72 hours of discovery. Failure to notify triggers liquidated damages of $250,000.",
+          "penalty_amount": 250000.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "MSA-002-INDEM",
+          "clause_type": "indemnification",
+          "text": "Axiom shall indemnify EuroCorp for all regulatory fines arising from Axiom's data processing failures.",
+          "penalty_amount": 500000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "LOAN-001",
+      "contract_type": "Senior Secured Credit Facility",
+      "parties": ["Axiom Data Systems Inc.", "National Commerce Bank"],
+      "jurisdiction": "New York",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "LOAN-001-COVENANT",
+          "clause_type": "financial_covenant",
+          "text": "Borrower shall maintain minimum cash reserves of $1,000,000 at all times. Breach of this covenant constitutes an Event of Default, allowing the Bank to freeze the credit facility.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "LOAN-001-WAIVER",
+          "clause_type": "waiver",
+          "text": "Bank may grant a temporary waiver of covenant compliance upon written request, at its sole discretion.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "INS-002",
+      "contract_type": "Cyber Liability Insurance Policy",
+      "parties": ["Axiom Data Systems Inc.", "CyberShield Underwriters"],
+      "jurisdiction": "New York",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "INS-002-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Insured must report any cyber incident within 48 hours of discovery. Coverage limit: $2,000,000.",
+          "penalty_amount": 0.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "INS-002-NOTIFY",
+          "clause_type": "notification_obligation",
+          "text": "All regulatory notifications made in connection with a covered incident must be shared with the insurer within 24 hours of submission.",
+          "penalty_amount": 0.0,
+          "deadline_days": 4,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "VENDOR-002",
+      "contract_type": "Cloud Infrastructure Agreement",
+      "parties": ["Axiom Data Systems Inc.", "CloudBase Corp."],
+      "jurisdiction": "California",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "VENDOR-002-SLA",
+          "clause_type": "service_level",
+          "text": "CloudBase guarantees 99.9% uptime. Downtime exceeding SLA entitles Axiom to service credits of $50,000/hour.",
+          "penalty_amount": 200000.0,
+          "deadline_days": 7,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "MSA-002",
+      "source_clause_id": "MSA-002-DPA",
+      "target_contract": "LOAN-001",
+      "target_clause_id": "LOAN-001-COVENANT",
+      "edge_type": "cascade_trigger",
+      "description": "The $250K DPA penalty if Axiom misses the 72-hour notification window will drop cash below $1M covenant threshold, triggering bank default.",
+      "discovered": false
+    },
+    {
+      "source_contract": "INS-002",
+      "source_clause_id": "INS-002-CLAIM",
+      "target_contract": "MSA-002",
+      "target_clause_id": "MSA-002-INDEM",
+      "edge_type": "condition_precedent",
+      "description": "Insurance must be claimed before indemnification demand from EuroCorp can be offset — claim must precede any indemnification response.",
+      "discovered": false
+    },
+    {
+      "source_contract": "VENDOR-002",
+      "source_clause_id": "VENDOR-002-SLA",
+      "target_contract": "INS-002",
+      "target_clause_id": "INS-002-CLAIM",
+      "edge_type": "cascade_trigger",
+      "description": "The CloudBase infrastructure failure that caused the breach also triggers an SLA credit claim — both must be filed concurrently.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "CP-005",
+      "name": "EuroCorp GmbH",
+      "role": "key_enterprise_client",
+      "profile": "litigious",
+      "relationship_health": 0.8,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-006",
+      "name": "National Commerce Bank",
+      "role": "primary_lender",
+      "profile": "aggressive",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-007",
+      "name": "CyberShield Underwriters",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-008",
+      "name": "CloudBase Corp.",
+      "role": "infrastructure_vendor",
+      "profile": "cooperative",
+      "relationship_health": 0.75,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "DL-005",
+      "description": "File cyber incident claim with CyberShield Underwriters (48-hour window)",
+      "contract_id": "INS-002",
+      "clause_id": "INS-002-CLAIM",
+      "due_day": 2,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Missing this voids $2M insurance coverage, leaving full remediation costs uninsured."
+    },
+    {
+      "deadline_id": "DL-006",
+      "description": "Send data breach notification to EuroCorp GmbH (72-hour window)",
+      "contract_id": "MSA-002",
+      "clause_id": "MSA-002-DPA",
+      "due_day": 3,
+      "penalty_if_missed": 250000.0,
+      "status": "active",
+      "consequence_description": "$250K liquidated damages AND potential GDPR regulatory fine cascade."
+    },
+    {
+      "deadline_id": "DL-007",
+      "description": "Share regulatory notification copy with CyberShield (24hr after DPA notice)",
+      "contract_id": "INS-002",
+      "clause_id": "INS-002-NOTIFY",
+      "due_day": 4,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Failure to share regulatory notice may invalidate insurance claim."
+    },
+    {
+      "deadline_id": "DL-008",
+      "description": "Request bank covenant waiver before cash drops below $1M (Day 5 window)",
+      "contract_id": "LOAN-001",
+      "clause_id": "LOAN-001-WAIVER",
+      "due_day": 5,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Without waiver, credit facility frozen when cash drops below covenant threshold."
+    },
+    {
+      "deadline_id": "DL-009",
+      "description": "Claim SLA service credits from CloudBase Corp. (7-day window)",
+      "contract_id": "VENDOR-002",
+      "clause_id": "VENDOR-002-SLA",
+      "due_day": 7,
+      "penalty_if_missed": 200000.0,
+      "status": "active",
+      "consequence_description": "Failure to claim voids $200K in service credits owed to Axiom."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "SHOCK-003",
+      "category": "cybersecurity",
+      "title": "Data Breach — 120,000 EuroCorp Customer Records Compromised",
+      "description": "A sophisticated cyberattack has breached Axiom's cloud infrastructure (hosted by CloudBase Corp.). Approximately 120,000 EuroCorp GmbH customer records have been exfiltrated. You face simultaneous obligations: (1) file insurance claim within 48 hours, (2) notify EuroCorp within 72 hours or face $250K penalty, (3) notify insurer of regulatory filings within 24 hours of notification. The $250K DPA penalty could push your cash below the $1M bank covenant threshold — investigate your contracts to understand the full cascade.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -50000.0,
+      "triggered_obligations": ["INS-002-CLAIM", "MSA-002-DPA"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "MSG-005",
+      "day_received": 1,
+      "sender": "Information Security Team",
+      "subject": "CRITICAL: Confirmed Data Breach — Immediate Action Required",
+      "body": "Forensics confirms a breach of our CloudBase-hosted environment. Approximately 120,000 EuroCorp customer records (names, emails, payment data) have been exfiltrated. Incident started approximately 6 hours ago. Regulatory clock has started. Legal and compliance review needed urgently.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 1,
+      "read": false
+    },
+    {
+      "message_id": "MSG-006",
+      "day_received": 1,
+      "sender": "CloudBase Corp. Security",
+      "subject": "Infrastructure Incident — Root Cause Analysis",
+      "body": "We have identified and patched the vulnerability exploited in today's breach. Our SLA guarantee applies to this downtime event. Please review Section 6.2 of your Infrastructure Agreement regarding service credit claims. Claims must be filed within 7 days.",
+      "is_legal_notice": false,
+      "requires_response_by_day": null,
+      "read": false
+    },
+    {
+      "message_id": "MSG-007",
+      "day_received": 2,
+      "sender": "EuroCorp GmbH Legal Department",
+      "subject": "Data Processing Incident — Formal Inquiry",
+      "body": "We are aware of reports of a data security incident involving our customer data held by Axiom. Under Article 33 GDPR and Section 7.4 of our Master Service Agreement, we require formal notification within 72 hours of incident discovery. Please confirm receipt and expected notification timeline.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 3,
+      "read": false
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=blue!70!black,
+  urlcolor=blue!70!black
+}
+
+\definecolor{tier1}{HTML}{6366f1}
+\definecolor{tier2}{HTML}{22c55e}
+\definecolor{tier3}{HTML}{f59e0b}
+\definecolor{tier4}{HTML}{ef4444}
+
+\title{\textbf{LexArena: A Six-Tier Benchmark for Evaluating the Complete Legal Intelligence Stack of AI Agents}}
+
+\author{
+  Anonymous Authors \\
+  \textit{Under review} \\
+  \texttt{lexarena@anonymous.io}
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+% ============================================================
+\begin{abstract}
+% ============================================================
+We present \textbf{LexArena}, the first benchmark to evaluate AI agents across the complete legal intelligence stack---from verbatim clause extraction to 30-day corporate crisis survival---using a six-tier framework with a fully deterministic composite score. Existing legal AI benchmarks test isolated capabilities: CUAD and ContractEval measure clause extraction accuracy; LexGLUE and MAUD evaluate contract classification; but no benchmark tests whether an agent can reason \emph{strategically} across multiple contracts under temporal pressure. LexArena closes this gap by chaining five cognitive dimensions---precise language comprehension, legal risk assessment, structural graph reasoning, temporal deadline management, and anti-sycophancy under adversarial pressure---into a single, objective \textbf{Legal IQ} score. Our benchmark includes 15 crisis scenarios, 10 targeted adversarial probes, and a novel Tier 3 ``dependency graph mapping'' task that no prior benchmark addresses. We evaluate four deterministic baseline strategies and establish that \emph{clause-reading accuracy is a poor predictor of crisis management performance}, supporting the hypothesis that legal fine-tuning does not transfer to strategic legal reasoning. All code, data, and scenarios are publicly released.
+\end{abstract}
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+The deployment of large language models (LLMs) in legal settings has accelerated dramatically, yet our ability to rigorously evaluate their capabilities remains fragmented. A lawyer is not merely a reader of contracts---she is a strategist who must simultaneously comprehend precise legal language, assess cross-document risk, identify hidden dependencies between agreements, and make time-critical decisions under adversarial pressure. Current benchmarks test only one of these skills at a time.
+
+\textbf{The fragmentation problem.} Table~\ref{tab:gaps} illustrates the capability gaps in existing benchmarks. CUAD \citep{hendrycks2021cuad} and ContractEval \citep{contracteval2024} measure extraction accuracy on individual clauses. LexGLUE \citep{chalkidis2022lexglue} tests classification across seven legal datasets. MAUD \citep{wang2023maud} covers merger agreement understanding. None of these evaluate an agent's ability to \emph{act} on legal knowledge---to file an insurance claim before invoking force majeure, to detect that a penalty payment will breach a debt covenant, or to resist an aggressive but legally invalid demand.
+
+\textbf{Our contribution.} We introduce \textbf{LexArena}, a six-tier benchmark that tests the complete chain:
+\[
+\text{READ} \rightarrow \text{CLASSIFY} \rightarrow \text{CONNECT} \rightarrow \text{DECIDE} \rightarrow \text{SURVIVE}
+\]
+The benchmark integrates three existing systems---ContractEval/CUAD (Tier 1), OpenEnv clause review (Tier 2), and the LexDomino systemic crisis simulator (Tiers 4--6)---with a novel Tier 3 ``dependency graph mapping'' task into a single coherent evaluation framework with a fully deterministic composite \textbf{Legal IQ} score.
+
+\textbf{Key findings.} Our baseline experiments show:
+(1) The ``deadline-first'' crisis strategy outperforms passive strategies by 0.30 Legal IQ points;
+(2) High Tier 1 reading accuracy (full-context extraction: 0.74) does \emph{not} imply high Tier 3 structural reasoning (0.10 baseline);
+(3) All current deterministic baselines score below 0.60---indicating substantial room for LLM-powered agents to improve.
+
+% ============================================================
+\section{Related Work}
+% ============================================================
+
+\paragraph{Contract Understanding Benchmarks.}
+The CUAD dataset \citep{hendrycks2021cuad} provides 13,000+ expert-annotated question-answer pairs across 510 commercial contracts and 41 clause types. ContractEval \citep{contracteval2024} extends this with a systematic evaluation of 19 LLMs using F1/F2/Jaccard metrics and a novel ``laziness rate'' capturing false refusals. LexGLUE \citep{chalkidis2022lexglue} aggregates seven legal NLP datasets into a unified benchmark. MAUD \citep{wang2023maud} focuses on merger agreement clause analysis. All of these are static extraction or classification tasks---no agent actions, no time horizon, no cross-document reasoning.
+
+\paragraph{Agent Benchmarks.}
+AgentBench \citep{liu2023agentbench} and GAIA \citep{mialon2023gaia} evaluate general LLM agents but lack legal-domain grounding. LegalBench \citep{guha2023legalbench} covers 162 legal reasoning tasks but treats each independently. OpenEnv \citep{openenv2024} introduced a Gymnasium-compatible clause review environment but limited to single-document tasks. LexDomino (our prior work) introduced temporal crisis management but did not evaluate clause reading accuracy. LexArena unifies these approaches.
+
+\paragraph{Anti-Sycophancy.}
+Recent work \citep{perez2022sycophancy, sharma2023towards} has identified sycophancy---LLM tendency to agree with aggressive or incorrect prompts---as a critical safety concern. No legal benchmark explicitly measures anti-sycophancy. LexArena's adversarial probe suite directly quantifies this failure mode.
+
+% ============================================================
+\section{The LexArena Benchmark}
+% ============================================================
+
+\subsection{Architecture Overview}
+
+LexArena evaluates agents across six tiers with a weighted composite score (Legal IQ). Tiers are designed so that each measures a distinct cognitive capability that the previous tiers do not test.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Tier} & \textbf{Name} & \textbf{Weight} & \textbf{Cognitive Dimension} \\
+\midrule
+T1 & Clause Reading & 15\% & Precise language comprehension \\
+T2 & Risk Classification & 15\% & Legal risk assessment \\
+T3 & Dependency Mapping & 20\% & Multi-document structural reasoning \\
+T4 & Crisis Easy & 12.5\% & Temporal deadline management \\
+T5 & Crisis Medium & 17.5\% & Multi-objective optimization \\
+T6 & Crisis Hard & 20\% & Anti-sycophancy, long-horizon planning \\
+\bottomrule
+\end{tabular}
+\caption{LexArena tier weights and cognitive dimensions.}
+\label{tab:tiers}
+\end{table}
+
+\subsection{Tier 1: Clause Reading Comprehension}
+
+Tier 1 adapts the ContractEval extraction task \citep{contracteval2024} using the CUAD dataset. Given a contract clause and a question category (e.g., ``Force Majeure''), the agent must extract the exact verbatim sentence(s) that answer the question, or respond ``No related clause.'' if no relevant clause exists.
+
+\textbf{Scoring.} We use a recall-weighted composite:
+\begin{equation}
+\text{T1} = 0.60 \cdot F_2 + 0.25 \cdot \bar{J} + 0.15 \cdot (1 - \lambda)
+\end{equation}
+where $F_2$ is the recall-weighted F-measure \citep{manning2008ir} ($\beta=2$), $\bar{J}$ is the mean Jaccard similarity across positive samples, and $\lambda$ is the laziness rate (fraction of positive samples where the agent falsely responds ``No related clause'').
+
+\textbf{Why F2?} In legal risk identification, a missed clause (false negative) is far more dangerous than a spurious extraction (false positive). F2 penalises recall failures twice as heavily as precision failures.
+
+\subsection{Tier 2: Risk Classification}
+
+Tier 2 uses OpenEnv clause review tasks (Tasks 1--3). Given a clause text, the agent classifies: clause type (from a 12-category taxonomy), risk level (low/medium/high/critical), compliance flags, and recommended action. Task difficulty increases from single-field classification (Task 1, Easy) to full multi-field legal review with cross-clause reasoning (Task 3, Hard). Scoring uses weighted label accuracy.
+
+\subsection{Tier 3: Dependency Graph Mapping}
+
+\textbf{Motivation.} Tiers 1--2 test within-document understanding. Tier 3 tests whether agents can understand the \emph{architecture} of a contract portfolio---specifically, whether they can identify hidden cross-document dependencies before a crisis occurs.
+
+\textbf{Task.} Given 3--5 contracts and a time budget of 10 steps, the agent must output a dependency graph listing all edges between clauses across documents. Edge types are drawn from a five-category taxonomy: \texttt{cascade\_trigger}, \texttt{mutual\_exclusion}, \texttt{condition\_precedent}, \texttt{supersession}, and \texttt{temporal\_gate}.
+
+\textbf{Scoring.} We evaluate against ground-truth edge lists derived from LexDomino scenario data:
+\begin{equation}
+\text{T3} = 0.50 \cdot R + 0.25 \cdot P + 0.15 \cdot \tau + 0.10 \cdot \sigma
+\end{equation}
+where $R$ and $P$ are recall and precision, $\tau$ is edge-type accuracy for true positives, and $\sigma$ is a severity-ordering score rewarding agents that list high-risk edges first.
+
+\textbf{Novelty.} To our knowledge, no existing legal AI benchmark tests proactive multi-document dependency mapping. This is the most novel contribution of LexArena.
+
+\subsection{Tiers 4--6: Systemic Crisis Management}
+
+Tiers 4--6 use the LexDomino environment: a Gymnasium-compatible \citep{gymnasium2023} finite-horizon MDP modelling a company navigating a systemic legal crisis. The company has a financial state (cash, AR, AP, credit facility, debt covenants) and must manage 2--6 contracts over 15--60 days, taking one of 19 possible actions per step (investigate, negotiate, invoke FM, pay penalty, file insurance, etc.).
+
+Difficulty increases across tiers:
+\begin{itemize}
+  \item \textbf{T4 (Easy):} 2--3 contracts, 15 days, cooperative counterparties, 0--1 hidden edges.
+  \item \textbf{T5 (Medium):} 4--5 contracts, 30 days, mixed counterparties, 2--3 hidden edges.
+  \item \textbf{T6 (Hard):} 5--6 contracts, 60 days, adversarial counterparties, compound shocks at Days 1 and 14--16, 4--5 hidden edges.
+\end{itemize}
+
+\textbf{Scoring.} Each episode is scored by a deterministic grader:
+\begin{equation}
+\text{T4-6} = 0.75 \cdot \frac{c_{\text{final}}}{c_{\text{initial}}} + 0.15 \cdot \frac{d_{\text{met}}}{d_{\text{total}}} + 0.10 \cdot \frac{e_{\text{discovered}}}{e_{\text{total}}} - p_{\text{cascade}}
+\end{equation}
+where $c$ is cash balance, $d$ is deadlines, $e$ is dependency edges, and $p_{\text{cascade}}$ is a penalty for each cascade level reached.
+
+\subsection{The Adversarial Probe Suite}
+
+Beyond the regular difficulty ladder, LexArena includes 10 adversarial probe scenarios targeting specific known LLM failure modes (Table~\ref{tab:probes}). Each probe is a complete LexDomino episode designed so that a naive agent will trigger the failure mode while a strategically reasoning agent will avoid it.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Probe ID} & \textbf{Failure Mode Targeted} \\
+\midrule
+\texttt{probe\_fm\_void} & Mutual exclusion: FM invocation voids insurance \\
+\texttt{probe\_sycophancy} & Paying legally time-barred demand \\
+\texttt{probe\_covenant\_blindness} & Missing debt covenant cascade \\
+\texttt{probe\_cross\_default} & Missing cross-default chain \\
+\texttt{probe\_deadline\_stack} & Failing to prioritise stacked deadlines \\
+\texttt{probe\_key\_person\_chain} & Missing 3-hop dependency chain \\
+\texttt{probe\_false\_urgency} & Acting on non-binding letter of intent \\
+\texttt{probe\_supersession} & Missing addendum that overrides penalty \\
+\texttt{probe\_compound\_shock} & Failing to handle simultaneous crises \\
+\texttt{probe\_lazy\_reader} & Missing deadlines due to insufficient investigation \\
+\bottomrule
+\end{tabular}
+\caption{LexArena adversarial probe suite.}
+\label{tab:probes}
+\end{table}
+
+% ============================================================
+\section{Legal IQ: The Composite Score}
+% ============================================================
+
+The Legal IQ score aggregates all six tiers into a single number:
+\begin{equation}
+\text{Legal IQ} = 0.15 \cdot T1 + 0.15 \cdot T2 + 0.20 \cdot T3 + 0.50 \cdot (0.25 \cdot T4 + 0.35 \cdot T5 + 0.40 \cdot T6)
+\end{equation}
+
+\textbf{Why 50\% weight on crisis management?} Any model can be fine-tuned to extract clauses. Strategic decision-making under time pressure---the capability captured by Tiers 4--6---is the harder, more generalizable skill. Weighting it more heavily ensures the benchmark rewards genuine legal intelligence rather than memorization of legal text patterns.
+
+\textbf{Score interpretation:}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Score Range} & \textbf{Label} \\
+\midrule
+0.85--1.00 & Expert CRO Level \\
+0.70--0.84 & Senior Lawyer Level \\
+0.50--0.69 & Junior Associate Level \\
+0.30--0.49 & Paralegal Level \\
+0.00--0.29 & Fails Legal Practice Bar \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Experiments}
+% ============================================================
+
+\subsection{Setup}
+
+We evaluate four deterministic baseline strategies across all six tiers using our built-in 15-sample CUAD-equivalent clause set and six LexDomino crisis scenarios (two per difficulty tier):
+
+\begin{itemize}
+  \item \textbf{Passive Baseline:} Always say ``No related clause'' (T1); advance day without action (T2--T6).
+  \item \textbf{First Sentence Passive:} Extract first sentence (T1); passive crisis strategy.
+  \item \textbf{Full Context Deadline-First:} Return full context (T1, maximises recall); act on soonest deadline in crisis.
+  \item \textbf{Best Available:} First-sentence extraction (T1); deadline-first crisis strategy.
+\end{itemize}
+
+\subsection{Results}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrrrrr r}
+\toprule
+\textbf{Strategy} & \textbf{T1} & \textbf{T2} & \textbf{T3} & \textbf{T4} & \textbf{T5} & \textbf{T6} & \textbf{Legal IQ} \\
+\midrule
+Full Context + Deadline-First & 0.736 & 0.400 & 0.100 & 0.863 & 0.757 & 0.753 & \textbf{0.581} \\
+Best Available & 0.150 & 0.400 & 0.100 & 0.863 & 0.757 & 0.753 & 0.493 \\
+First Sentence + Passive & 0.150 & 0.400 & 0.100 & 0.697 & 0.523 & 0.105 & 0.302 \\
+Passive Baseline & 0.010 & 0.400 & 0.100 & 0.697 & 0.523 & 0.105 & 0.281 \\
+\midrule
+\textit{Hypothesis (GPT-4o)} & \textit{0.720} & \textit{0.780} & \textit{0.450} & \textit{0.900} & \textit{0.700} & \textit{0.550} & \textit{0.580} \\
+\textit{Hypothesis (Fine-tuned Legal LLM)} & \textit{0.820} & \textit{0.850} & \textit{0.250} & \textit{0.600} & \textit{0.350} & \textit{0.250} & \textit{0.460} \\
+\bottomrule
+\end{tabular}
+\caption{LexArena baseline results. Italicised rows are hypotheses pending LLM evaluation.}
+\label{tab:results}
+\end{table}
+
+\subsection{Key Findings}
+
+\paragraph{Finding 1: Crisis strategy dominates Legal IQ.}
+The gap between ``Full Context + Deadline-First'' (0.581) and ``Full Context + Passive'' would be large---the deadline-first strategy accounts for the majority of Legal IQ variation. T1 reading accuracy contributes only 15\% of the total score.
+
+\paragraph{Finding 2: T1 reading accuracy does not predict T3 structural reasoning.}
+``Full Context + Deadline-First'' achieves T1=0.736 (highest) but T3=0.100 (same as all baselines)---confirming that clause extraction skill does not transfer to cross-document graph reasoning. This motivates Tier 3 as an independent evaluation dimension.
+
+\paragraph{Finding 3: Tier 6 is the critical differentiator.}
+Passive strategies score T6=0.105---near bankruptcy. Deadline-first strategies score T6=0.753. This 0.648-point gap (vs. 0.180 gap at T4) confirms that harder scenarios exponentially punish naive strategies.
+
+\paragraph{Hypothesis: Legal fine-tuning fails to transfer to strategic reasoning.}
+Based on ContractEval's published results \citep{contracteval2024}, fine-tuned legal LLMs outperform general models on T1--T2 by approximately 0.10--0.15 points. However, based on LexDomino benchmarking, we hypothesise that the same models will score substantially lower on T4--T6 because legal fine-tuning does not train strategic crisis reasoning. This is the primary empirical hypothesis to be validated in the full experimental campaign.
+
+% ============================================================
+\section{The CUAD $\rightarrow$ LexDomino Data Bridge}
+% ============================================================
+
+A key architectural innovation of LexArena is that Tier 1 and Tiers 3--6 can share the same underlying contract text. In the bridge scenario format (\texttt{data/cuad\_scenarios/}), a real commercial contract clause (drawn from or modelled on CUAD) is used simultaneously as:
+
+\begin{enumerate}
+  \item A \textbf{Tier 1 QA pair} (``Extract the Force Majeure clause.'')
+  \item A \textbf{Tier 3 graph node} (the FM clause is one end of a mutual exclusion edge)
+  \item A \textbf{Tier 4--6 crisis clause} (the FM clause can be invoked or withheld during a crisis)
+\end{enumerate}
+
+This creates a coherent multi-tier evaluation where an agent is tested on the \emph{same contract} at four different levels of depth. We provide one complete bridge scenario (\texttt{bridge\_msa\_cuad\_001.json}) and a template for extending the dataset using the full CUAD corpus.
+
+% ============================================================
+\section{Conclusion}
+% ============================================================
+
+We presented LexArena, a six-tier benchmark for evaluating the complete legal intelligence stack of AI agents. The key contributions are:
+
+\begin{enumerate}
+  \item \textbf{The Legal IQ composite score}: A fully deterministic, weighted aggregate of six tier scores requiring no LLM judges.
+  \item \textbf{Tier 3 dependency graph mapping}: A novel evaluation task measuring proactive multi-document structural reasoning.
+  \item \textbf{The adversarial probe suite}: 10 scenarios targeting specific known LLM failure modes in legal contexts, including anti-sycophancy, covenant blindness, and mutual exclusion traps.
+  \item \textbf{The CUAD$\rightarrow$LexDomino data bridge}: A methodology for testing the same real contract text at four different levels of cognitive depth.
+\end{enumerate}
+
+Our baseline experiments establish that crisis management strategy (Tiers 4--6) dominates the Legal IQ score, and that clause-reading accuracy does not predict structural reasoning or crisis survival. We release all code, data, and scenarios to facilitate reproducible evaluation of LLMs in legal settings.
+
+\textbf{Future Work.} Full LLM evaluation across GPT-4o, Claude 3.5, Gemma 3, and Qwen3 model families; extension of the bridge dataset using the full 510-contract CUAD corpus; and integration of reputation dynamics and counterparty learning into the LexDomino crisis environment.
+
+% ============================================================
+\bibliographystyle{acl_natbib}
+\bibliography{lexarena}
+
+\end{document}

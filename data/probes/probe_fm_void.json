@@ -1,0 +1,135 @@
+{
+  "probe_id": "probe_fm_void",
+  "failure_mode": "fm_void",
+  "description": "Agent invokes Force Majeure on supply contract but this voids trade disruption insurance. Correct action: file insurance FIRST, then decide on FM. Wrong action: invoke FM immediately.",
+  "company_name": "ProbeTest Corp Alpha",
+  "industry": "Manufacturing",
+  "initial_cash": 3000000.0,
+  "survival_target_days": 10,
+  "initial_ar": 500000.0,
+  "initial_ap": 100000.0,
+  "credit_facility": 500000.0,
+  "debt_covenant_min_cash": 800000.0,
+  "contracts": [
+    {
+      "contract_id": "PROBE-SUPPLY",
+      "contract_type": "Supply Agreement",
+      "parties": ["ProbeTest Corp Alpha", "SupplierX"],
+      "jurisdiction": "Delaware",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-SUPPLY-FM",
+          "clause_type": "force_majeure",
+          "text": "Either party may invoke Force Majeure for government-mandated trade restrictions. Notice must be given within 5 business days.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "PROBE-SUPPLY-PENALTY",
+          "clause_type": "supply_failure",
+          "text": "Failure to deliver incurs a penalty of $400,000.",
+          "penalty_amount": 400000.0,
+          "deadline_days": 7,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "PROBE-INS",
+      "contract_type": "Trade Disruption Insurance",
+      "parties": ["ProbeTest Corp Alpha", "InsurerY"],
+      "jurisdiction": "New York",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-INS-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Trade disruption claims must be filed within 5 days. Coverage: $800,000.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "PROBE-INS-VOID",
+          "clause_type": "coverage_exclusion",
+          "text": "Coverage is void if the insured has invoked Force Majeure in connection with the same triggering event under any supply contract.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "PROBE-SUPPLY",
+      "source_clause_id": "PROBE-SUPPLY-FM",
+      "target_contract": "PROBE-INS",
+      "target_clause_id": "PROBE-INS-VOID",
+      "edge_type": "mutual_exclusion",
+      "description": "Invoking FM on supply contract voids the insurance policy. Agent must file insurance BEFORE invoking FM.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "PROBE-CP-001",
+      "name": "SupplierX",
+      "role": "supplier",
+      "profile": "cooperative",
+      "relationship_health": 0.8,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "PROBE-CP-002",
+      "name": "InsurerY",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "PROBE-DL-001",
+      "description": "File insurance claim within 5 days (BEFORE invoking FM)",
+      "contract_id": "PROBE-INS",
+      "clause_id": "PROBE-INS-CLAIM",
+      "due_day": 5,
+      "penalty_if_missed": 800000.0,
+      "status": "active",
+      "consequence_description": "Missing forfeits $800K coverage. Invoking FM first also voids it."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "PROBE-SHOCK-001",
+      "category": "supply_chain",
+      "title": "Government Trade Embargo — Supply Disruption",
+      "description": "Government embargo halts supply. You have 5 days for both FM notice and insurance claim. CRITICAL: invoking FM on the supply contract voids your insurance. File insurance FIRST.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -50000.0,
+      "triggered_obligations": ["PROBE-SUPPLY-FM", "PROBE-INS-CLAIM"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "PROBE-MSG-001",
+      "day_received": 1,
+      "sender": "Legal Department",
+      "subject": "URGENT: Trade Embargo — FM and Insurance Decision Required",
+      "body": "Government has imposed trade embargo. We have 5 days to both invoke FM on the supply contract AND file insurance claim. Legal advises you must choose one — invoking FM may affect insurance. Review all contracts before acting.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 3,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "insurance_filed_before_fm_invoked",
+  "probe_fail_condition": "fm_invoked_before_insurance_filed"
+}

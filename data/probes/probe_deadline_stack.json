@@ -1,0 +1,150 @@
+{
+  "probe_id": "probe_deadline_stack",
+  "failure_mode": "deadline_stack",
+  "description": "Three deadlines expire within 48 hours. Agent must prioritise: insurance (Day 1) > FM notice (Day 2) > waiver request (Day 2). Failing any costs 200K+.",
+  "company_name": "ProbeTest Corp Epsilon",
+  "industry": "Pharmaceuticals",
+  "initial_cash": 2000000.0,
+  "survival_target_days": 10,
+  "initial_ar": 300000.0,
+  "initial_ap": 100000.0,
+  "credit_facility": 500000.0,
+  "debt_covenant_min_cash": 700000.0,
+  "contracts": [
+    {
+      "contract_id": "DL-INS",
+      "contract_type": "Liability Insurance",
+      "parties": [
+        "ProbeTest Corp Epsilon",
+        "Insurer"
+      ],
+      "jurisdiction": "NY",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "DL-INS-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Claims must be filed within 24 hours. Coverage: ,000.",
+          "penalty_amount": 0.0,
+          "deadline_days": 1,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "DL-SUPPLY",
+      "contract_type": "Supply Agreement",
+      "parties": [
+        "ProbeTest Corp Epsilon",
+        "Supplier"
+      ],
+      "jurisdiction": "TX",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "DL-SUPPLY-FM",
+          "clause_type": "force_majeure",
+          "text": "FM notice required within 48 hours.",
+          "penalty_amount": 250000.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "DL-LOAN",
+      "contract_type": "Credit Facility",
+      "parties": [
+        "ProbeTest Corp Epsilon",
+        "Bank"
+      ],
+      "jurisdiction": "NY",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "DL-LOAN-COVEN",
+          "clause_type": "financial_covenant",
+          "text": "Minimum cash: ,000. Breach = Event of Default.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "DL-LOAN-WAIVER",
+          "clause_type": "waiver",
+          "text": "Waiver request must be submitted within 48 hours of triggering event.",
+          "penalty_amount": 0.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [],
+  "counterparties": [],
+  "deadlines": [
+    {
+      "deadline_id": "DL-DL-001",
+      "description": "File insurance claim (24h window \u2014 HIGHEST PRIORITY)",
+      "contract_id": "DL-INS",
+      "clause_id": "DL-INS-CLAIM",
+      "due_day": 1,
+      "penalty_if_missed": 500000.0,
+      "status": "active",
+      "consequence_description": "Forfeits  coverage."
+    },
+    {
+      "deadline_id": "DL-DL-002",
+      "description": "Send FM notice to supplier (48h window)",
+      "contract_id": "DL-SUPPLY",
+      "clause_id": "DL-SUPPLY-FM",
+      "due_day": 2,
+      "penalty_if_missed": 250000.0,
+      "status": "active",
+      "consequence_description": " penalty if missed."
+    },
+    {
+      "deadline_id": "DL-DL-003",
+      "description": "Request bank covenant waiver (48h window)",
+      "contract_id": "DL-LOAN",
+      "clause_id": "DL-LOAN-WAIVER",
+      "due_day": 2,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Without waiver, credit facility frozen if cash dips."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "DL-SHOCK",
+      "category": "regulatory",
+      "title": "Regulatory Shutdown \u2014 Three Simultaneous Deadlines",
+      "description": "Regulatory action has triggered obligations across three contracts simultaneously. Insurance must be claimed in 24h. FM notice and waiver request both due in 48h. Prioritise correctly.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -80000.0,
+      "triggered_obligations": [
+        "DL-INS-CLAIM",
+        "DL-SUPPLY-FM",
+        "DL-LOAN-WAIVER"
+      ]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "DL-MSG",
+      "day_received": 1,
+      "sender": "Legal Team",
+      "subject": "CRITICAL: THREE Simultaneous Deadlines \u2014 Prioritise Now",
+      "body": "Three contract deadlines triggered simultaneously: (1) Insurance claim due in 24h. (2) FM notice due in 48h. (3) Bank waiver request due in 48h. The insurance is the most cash-critical \u2014 prioritise it first.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 1,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "insurance_filed_day_1_fm_and_waiver_day_2",
+  "probe_fail_condition": "any_deadline_missed"
+}

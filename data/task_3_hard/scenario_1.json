@@ -1,0 +1,118 @@
+{
+  "contract_meta": {
+    "contract_type": "Software Licensing and Services Agreement",
+    "parties": ["Enterprise Software Co", "MegaRetail Systems Inc"],
+    "jurisdiction": "State of California",
+    "effective_date": "2024-06-01"
+  },
+  "clauses": [
+    {
+      "text": "Licensor hereby grants to Licensee a non-exclusive, non-transferable license to use the Software solely for Licensee's internal business purposes. Licensee shall not sublicense, sell, or transfer the Software to any third party without Licensor's prior written consent.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["non-exclusive", "non-transferable", "internal business", "sublicense"],
+      "difficulty_note": "Standard IP license grant with appropriate restrictions"
+    },
+    {
+      "text": "Licensee agrees to pay Licensor license fees as follows: (a) a one-time license fee of $500,000 due upon execution, and (b) annual maintenance and support fees of $100,000 due on each anniversary of the Effective Date. All fees are non-refundable.",
+      "clause_type": "payment_terms",
+      "risk_level": "high",
+      "issues": ["missing_time_limit", "unreasonable_penalty"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["license fees", "non-refundable", "annual maintenance"],
+      "difficulty_note": "Non-refundable fees may be excessive; consider refund provisions for early termination"
+    },
+    {
+      "text": "LICENSOR SHALL NOT BE LIABLE TO LICENSEE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR EXEMPLARY DAMAGES ARISING OUT OF OR RELATED TO THIS AGREEMENT, REGARDLESS OF WHETHER LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.",
+      "clause_type": "limitation_of_liability",
+      "risk_level": "critical",
+      "issues": ["missing_liability_cap", "one_sided_obligation"],
+      "recommended_action": "escalate_to_senior_counsel",
+      "reasoning_keywords": ["shall not be liable", "indirect", "incidental", "consequential"],
+      "difficulty_note": "Very broad liability exclusion; conflicts with indemnification obligations elsewhere"
+    },
+    {
+      "text": "Each party shall indemnify, defend, and hold harmless the other party from and against any claims, damages, losses, and expenses arising from or related to the indemnifying party's breach of this Agreement, negligence, or violation of applicable laws.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["overly_broad_scope"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "defend", "hold harmless", "breach", "negligence"],
+      "difficulty_note": "Indemnification is broadly worded; should be tied to specific acts"
+    },
+    {
+      "text": "Licensee shall have the right to terminate this Agreement: (a) for convenience upon ninety days prior written notice, (b) immediately upon material breach by Licensor that remains uncured for thirty days after written notice, or (c) immediately if Licensor becomes insolvent or files for bankruptcy.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["terminate", "convenience", "material breach", "insolvent"],
+      "difficulty_note": "Balanced termination rights for both parties"
+    },
+    {
+      "text": "Licensor shall maintain the following insurance coverages: (a) Commercial General Liability with limits of $2,000,000 per occurrence, (b) Professional Liability/E&O with limits of $5,000,000 per claim, and (c) Workers Compensation as required by law. All policies shall name Licensee as additional insured.",
+      "clause_type": "insurance",
+      "risk_level": "medium",
+      "issues": ["missing_carve_out"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["insurance", "additional insured", "$5,000,000", "E&O"],
+      "difficulty_note": "Should include carve-out for Licensee's gross negligence"
+    },
+    {
+      "text": "During the term of this Agreement and for a period of two years thereafter, Licensee agrees not to directly or indirectly solicit, hire, or engage any employee or contractor of Licensor who was involved in the performance of this Agreement.",
+      "clause_type": "non_compete",
+      "risk_level": "high",
+      "issues": ["overly_broad_scope", "ambiguous_definition"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["solicit", "hire", "contractor", "two years"],
+      "difficulty_note": "Non-solicitation is overly broad; geographic scope unclear"
+    },
+    {
+      "text": "The parties acknowledge that in the course of performing under this Agreement, each party may have access to confidential information of the other party. Each party agrees to protect the other's confidential information using the same degree of care it uses to protect its own confidential information, but in no event less than reasonable care.",
+      "clause_type": "confidentiality",
+      "risk_level": "medium",
+      "issues": ["vague_language"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["confidential information", "reasonable care", "protect"],
+      "difficulty_note": "Reasonable care standard is vague; should define specific safeguards"
+    },
+    {
+      "text": "This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, and agreements relating to the subject matter hereof. No amendment or modification shall be effective unless in writing and signed by both parties.",
+      "clause_type": "representations",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["entire agreement", "supersedes", "amendment", "in writing"],
+      "difficulty_note": "Standard integration clause"
+    },
+    {
+      "text": "Any dispute arising out of or related to this Agreement shall be resolved exclusively by binding arbitration in San Francisco, California, administered by the American Arbitration Association under its Commercial Arbitration Rules. The arbitrator shall have authority to award injunctive relief. Judgment on the award may be entered in any court of competent jurisdiction.",
+      "clause_type": "dispute_resolution",
+      "risk_level": "high",
+      "issues": ["silent_on_key_issue", "one_sided_obligation"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["arbitration", "San Francisco", "American Arbitration Association", "injunctive relief"],
+      "difficulty_note": "Arbitration may disadvantage Licensee; should negotiate neutral location"
+    },
+    {
+      "text": "Licensor warrants that the Software will perform substantially in accordance with the Documentation during the warranty period of ninety days from delivery. This warranty is exclusive and in lieu of all other warranties, express or implied, including but not limited to merchantability and fitness for a particular purpose.",
+      "clause_type": "warranty",
+      "risk_level": "medium",
+      "issues": ["missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["warrants", "substantially", "Documentation", "warranty period", "ninety days"],
+      "difficulty_note": "Very limited warranty period; should align with maintenance term"
+    },
+    {
+      "text": "All intellectual property rights in any work product, modifications, or enhancements created by Licensor specifically for Licensee under this Agreement shall be owned by Licensee. Licensor retains all rights in its pre-existing intellectual property and any general know-how used in creating work product.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["work product", "modifications", "enhancements", "pre-existing intellectual property"],
+      "difficulty_note": "Appropriate IP ownership split; protects both parties"
+    }
+  ]
+}

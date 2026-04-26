@@ -1,0 +1,46 @@
+{
+  "contract_meta": {
+    "contract_type": "Non-Disclosure Agreement",
+    "parties": ["Alpha Corp", "Beta Inc"],
+    "jurisdiction": "State of Delaware",
+    "effective_date": "2024-01-15"
+  },
+  "clauses": [
+    {
+      "text": "Each party agrees to hold in confidence all Confidential Information disclosed by the other party and shall not use such information except for the purposes of evaluating a potential business relationship between the parties.",
+      "clause_type": "confidentiality",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["confidential", "hold in confidence", "business relationship"],
+      "difficulty_note": "Standard confidentiality clause with clear obligations"
+    },
+    {
+      "text": "This Agreement shall remain in effect for a period of two years from the Effective Date, unless terminated earlier by either party upon thirty days written notice.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["two years", "termination", "written notice"],
+      "difficulty_note": "Clear term and termination provisions"
+    },
+    {
+      "text": "This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of laws principles.",
+      "clause_type": "governing_law",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["governed by", "laws of Delaware", "construed"],
+      "difficulty_note": "Standard governing law clause"
+    },
+    {
+      "text": "Neither party may assign this Agreement without the prior written consent of the other party, which consent shall not be unreasonably withheld.",
+      "clause_type": "assignment",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["assign", "written consent", "not unreasonably withheld"],
+      "difficulty_note": "Standard assignment restriction"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "scenario_id": "cascade_medium_2",
+  "company_name": "PrimeVault Financial Services",
+  "industry": "Fintech / Payment Processing",
+  "initial_cash": 4000000.0,
+  "survival_target_days": 20,
+  "initial_ar": 600000.0,
+  "initial_ap": 200000.0,
+  "credit_facility": 1500000.0,
+  "debt_covenant_min_cash": 1200000.0,
+  "contracts": [
+    {
+      "contract_id": "PROC-001",
+      "contract_type": "Payment Processing Agreement",
+      "parties": ["PrimeVault Financial Services", "CardNetwork Global"],
+      "jurisdiction": "State of Delaware",
+      "effective_date": "2023-03-01",
+      "clauses": [
+        {
+          "clause_id": "PROC-001-SUSPEND",
+          "clause_type": "service_suspension",
+          "text": "CardNetwork may suspend PrimeVault's processing license immediately upon evidence of regulatory non-compliance, fraud, or material breach of the Payment Card Industry Data Security Standards (PCI-DSS). Suspension persists until a third-party audit confirms compliance.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "PROC-001-NOTICE",
+          "clause_type": "breach_notice",
+          "text": "PrimeVault must notify CardNetwork of any security incident affecting cardholder data within 24 hours of discovery.",
+          "penalty_amount": 150000.0,
+          "deadline_days": 1,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "MERCHANT-001",
+      "contract_type": "Merchant Services Agreement",
+      "parties": ["PrimeVault Financial Services", "ShopMax Retail Group"],
+      "jurisdiction": "State of Delaware",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "MERCHANT-001-SLA",
+          "clause_type": "service_level",
+          "text": "PrimeVault guarantees 99.9% payment processing uptime. Any suspension of processing services exceeding 4 hours triggers liquidated damages of $75,000 per day.",
+          "penalty_amount": 600000.0,
+          "deadline_days": 8,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "MERCHANT-001-TERM",
+          "clause_type": "termination",
+          "text": "ShopMax may terminate immediately if PrimeVault's processing license is suspended for more than 48 hours, with a $500,000 early termination penalty payable by PrimeVault.",
+          "penalty_amount": 500000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "REG-001",
+      "contract_type": "Regulatory Compliance Agreement",
+      "parties": ["PrimeVault Financial Services", "Financial Conduct Authority (FCA)"],
+      "jurisdiction": "UK / EU",
+      "effective_date": "2022-01-01",
+      "clauses": [
+        {
+          "clause_id": "REG-001-REPORT",
+          "clause_type": "regulatory_reporting",
+          "text": "PrimeVault must file a Serious Incident Report with the FCA within 72 hours of any cybersecurity incident affecting payment data. Failure to report incurs fines starting at £250,000.",
+          "penalty_amount": 320000.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "INS-004",
+      "contract_type": "Cyber Liability Policy",
+      "parties": ["PrimeVault Financial Services", "SecureCover Underwriters"],
+      "jurisdiction": "State of New York",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "INS-004-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Cyber incident claims must be filed within 48 hours. Coverage up to $3,000,000.",
+          "penalty_amount": 0.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "PROC-001",
+      "source_clause_id": "PROC-001-SUSPEND",
+      "target_contract": "MERCHANT-001",
+      "target_clause_id": "MERCHANT-001-SLA",
+      "edge_type": "cascade_trigger",
+      "description": "CardNetwork license suspension directly triggers ShopMax SLA breach ($75K/day). After 48 hours, ShopMax can terminate and demand $500K penalty.",
+      "discovered": false
+    },
+    {
+      "source_contract": "REG-001",
+      "source_clause_id": "REG-001-REPORT",
+      "target_contract": "PROC-001",
+      "target_clause_id": "PROC-001-NOTICE",
+      "edge_type": "condition_precedent",
+      "description": "The FCA report (72h) must be consistent with the CardNetwork notice (24h). Filing inconsistent reports exposes PrimeVault to regulatory perjury risk and voids the insurance claim.",
+      "discovered": false
+    },
+    {
+      "source_contract": "INS-004",
+      "source_clause_id": "INS-004-CLAIM",
+      "target_contract": "MERCHANT-001",
+      "target_clause_id": "MERCHANT-001-SLA",
+      "edge_type": "condition_precedent",
+      "description": "Insurance must be claimed within 48h before ShopMax SLA damages are assessed — claim precedes and partially offsets merchant damages.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "CP-013",
+      "name": "CardNetwork Global",
+      "role": "payment_network",
+      "profile": "bureaucratic",
+      "relationship_health": 0.9,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-014",
+      "name": "ShopMax Retail Group",
+      "role": "key_merchant",
+      "profile": "aggressive",
+      "relationship_health": 0.85,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-015",
+      "name": "Financial Conduct Authority (FCA)",
+      "role": "regulator",
+      "profile": "litigious",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-016",
+      "name": "SecureCover Underwriters",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "DL-015",
+      "description": "Notify CardNetwork Global of security incident (24-hour window)",
+      "contract_id": "PROC-001",
+      "clause_id": "PROC-001-NOTICE",
+      "due_day": 1,
+      "penalty_if_missed": 150000.0,
+      "status": "active",
+      "consequence_description": "$150K penalty AND CardNetwork may suspend license without notice."
+    },
+    {
+      "deadline_id": "DL-016",
+      "description": "File cyber incident claim with SecureCover Underwriters (48-hour window)",
+      "contract_id": "INS-004",
+      "clause_id": "INS-004-CLAIM",
+      "due_day": 2,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Missing this forfeits $3M insurance coverage."
+    },
+    {
+      "deadline_id": "DL-017",
+      "description": "File FCA Serious Incident Report (72-hour window)",
+      "contract_id": "REG-001",
+      "clause_id": "REG-001-REPORT",
+      "due_day": 3,
+      "penalty_if_missed": 320000.0,
+      "status": "active",
+      "consequence_description": "£250,000+ FCA fine and potential processing license revocation."
+    },
+    {
+      "deadline_id": "DL-018",
+      "description": "Prevent ShopMax SLA breach from accumulating beyond $600K cap (Day 8)",
+      "contract_id": "MERCHANT-001",
+      "clause_id": "MERCHANT-001-SLA",
+      "due_day": 8,
+      "penalty_if_missed": 600000.0,
+      "status": "active",
+      "consequence_description": "Daily LDs of $75K accumulate if processing remains suspended."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "SHOCK-006",
+      "category": "cybersecurity",
+      "title": "PCI-DSS Breach — 80,000 Cardholder Records Stolen",
+      "description": "A SQL injection attack on PrimeVault's payment database has exfiltrated 80,000 cardholder records including CVVs and expiry dates. CardNetwork Global's security team has flagged anomalous activity. You have 24 hours to notify CardNetwork or face license suspension. You have 48 hours to file insurance. You have 72 hours to report to the FCA. WARNING: The CardNetwork notice and FCA report must be consistent — file the insurance claim before either regulatory submission to preserve coverage.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -30000.0,
+      "triggered_obligations": ["PROC-001-NOTICE", "INS-004-CLAIM", "REG-001-REPORT"]
+    },
+    {
+      "shock_id": "SHOCK-007",
+      "category": "regulatory",
+      "title": "CardNetwork Emergency Audit — Processing Suspended",
+      "description": "On Day 5, CardNetwork Global announces an emergency audit of PrimeVault's PCI-DSS compliance and suspends the processing license pending results. ShopMax SLA breach clock starts. If suspension exceeds 48 hours, ShopMax can terminate and claim $500K. Agent must manage audit cooperation while minimising merchant damage.",
+      "occurs_on_day": 5,
+      "immediate_cash_impact": 0.0,
+      "triggered_obligations": ["MERCHANT-001-SLA"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "MSG-012",
+      "day_received": 1,
+      "sender": "Information Security Team",
+      "subject": "CRITICAL: Confirmed PCI-DSS Breach — Immediate Action",
+      "body": "Forensics confirms SQL injection affecting our payment database. 80,000 cardholder records compromised. Breach occurred approximately 3 hours ago. CardNetwork anomaly detection has flagged our account. We have a 24-hour window to self-report. Legal and compliance review required urgently. Check all notification obligations across contracts.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 1,
+      "read": false
+    },
+    {
+      "message_id": "MSG-013",
+      "day_received": 1,
+      "sender": "CardNetwork Global Security Operations",
+      "subject": "Security Alert — Anomalous Activity Detected on PrimeVault Account",
+      "body": "Our fraud detection systems have flagged unusual data access patterns on your account. We require your incident response status within 24 hours under Section 8.3 of your Processing Agreement. Failure to respond may result in precautionary license suspension.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 1,
+      "read": false
+    }
+  ]
+}

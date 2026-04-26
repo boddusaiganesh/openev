@@ -1,0 +1,125 @@
+{
+  "probe_id": "probe_lazy_reader",
+  "failure_mode": "lazy_reader",
+  "description": "Every contract clause has a clear, relevant answer to the crisis. An agent that uses cross_reference or review_deadline lazily without reading will miss all deadlines. Correct: thorough investigation before action.",
+  "company_name": "ProbeTest Corp Kappa",
+  "industry": "Finance",
+  "initial_cash": 2000000.0,
+  "survival_target_days": 8,
+  "initial_ar": 300000.0,
+  "initial_ap": 50000.0,
+  "credit_facility": 500000.0,
+  "debt_covenant_min_cash": 700000.0,
+  "contracts": [
+    {
+      "contract_id": "LR-MSA",
+      "contract_type": "Master Service Agreement",
+      "parties": [
+        "ProbeTest Corp Kappa",
+        "FinanceClient"
+      ],
+      "jurisdiction": "NY",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "LR-MSA-NOTICE",
+          "clause_type": "breach_notice",
+          "text": "Upon any service disruption, Kappa must notify FinanceClient within 24 hours with full incident details. Failure incurs ,000 in damages.",
+          "penalty_amount": 150000.0,
+          "deadline_days": 1,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "LR-MSA-PLAN",
+          "clause_type": "remediation",
+          "text": "A written remediation plan must be provided within 72 hours of the incident, detailing recovery steps and timeline.",
+          "penalty_amount": 100000.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "LR-MSA-AUDIT",
+          "clause_type": "audit_rights",
+          "text": "FinanceClient may conduct an emergency audit within 5 business days. Kappa must grant access within 24 hours of the audit request.",
+          "penalty_amount": 75000.0,
+          "deadline_days": 5,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [],
+  "counterparties": [
+    {
+      "counterparty_id": "LR-CP-001",
+      "name": "FinanceClient",
+      "role": "key_client",
+      "profile": "bureaucratic",
+      "relationship_health": 0.9,
+      "risk_profile_revealed": true
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "LR-DL-001",
+      "description": "Send incident notification to FinanceClient (24h)",
+      "contract_id": "LR-MSA",
+      "clause_id": "LR-MSA-NOTICE",
+      "due_day": 1,
+      "penalty_if_missed": 150000.0,
+      "status": "active",
+      "consequence_description": " damages."
+    },
+    {
+      "deadline_id": "LR-DL-002",
+      "description": "Submit remediation plan (72h)",
+      "contract_id": "LR-MSA",
+      "clause_id": "LR-MSA-PLAN",
+      "due_day": 3,
+      "penalty_if_missed": 100000.0,
+      "status": "active",
+      "consequence_description": " damages."
+    },
+    {
+      "deadline_id": "LR-DL-003",
+      "description": "Grant audit access if requested (5 days)",
+      "contract_id": "LR-MSA",
+      "clause_id": "LR-MSA-AUDIT",
+      "due_day": 5,
+      "penalty_if_missed": 75000.0,
+      "status": "active",
+      "consequence_description": " damages."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "LR-SHOCK",
+      "category": "cybersecurity",
+      "title": "Service Outage \u2014 All Deadlines Are Clearly Stated in Contracts",
+      "description": "A service outage has triggered multiple obligations. ALL deadlines are explicitly stated in the contract clauses. A thorough reader will find them all. A lazy reader who skips reading and just advances days will miss every deadline. Correct action: read all clauses thoroughly before acting.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -30000.0,
+      "triggered_obligations": [
+        "LR-MSA-NOTICE",
+        "LR-MSA-PLAN"
+      ]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "LR-MSG",
+      "day_received": 1,
+      "sender": "IT Operations",
+      "subject": "Service Outage \u2014 Review Contractual Obligations",
+      "body": "We have experienced a service outage affecting FinanceClient. Legal advises there are multiple contractual obligations triggered. Please review the Master Service Agreement for all notification and remediation requirements. Deadlines are time-sensitive.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 1,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "all_three_deadlines_met",
+  "probe_fail_condition": "any_deadline_missed_due_to_insufficient_investigation"
+}

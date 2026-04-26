@@ -1,0 +1,160 @@
+{
+  "scenario_id": "cascade_easy_1",
+  "company_name": "NovaTech Solutions Ltd.",
+  "industry": "SaaS / B2B Software",
+  "initial_cash": 2000000.0,
+  "survival_target_days": 10,
+  "initial_ar": 400000.0,
+  "initial_ap": 150000.0,
+  "credit_facility": 500000.0,
+  "debt_covenant_min_cash": 500000.0,
+  "contracts": [
+    {
+      "contract_id": "MSA-001",
+      "contract_type": "Master Service Agreement",
+      "parties": ["NovaTech Solutions Ltd.", "GlobalRetail Inc."],
+      "jurisdiction": "State of New York",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "MSA-001-SLA",
+          "clause_type": "service_level",
+          "text": "Vendor shall maintain 99.5% uptime. For each hour of downtime exceeding SLA, Vendor shall pay a penalty of $5,000, capped at $100,000 per month.",
+          "penalty_amount": 100000.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "MSA-001-FM",
+          "clause_type": "force_majeure",
+          "text": "Force Majeure events suspend obligations. Notice must be given within 48 hours of the triggering event.",
+          "penalty_amount": 0.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "MSA-001-TERM",
+          "clause_type": "termination",
+          "text": "Either party may terminate for material breach upon 30 days written notice with a 15-day cure period.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "INS-001",
+      "contract_type": "Commercial General Liability Policy",
+      "parties": ["NovaTech Solutions Ltd.", "Apex Insurance Group"],
+      "jurisdiction": "State of New York",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "INS-001-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "All claims must be filed within 72 hours of the incident giving rise to the claim. Late filing voids coverage for the incident.",
+          "penalty_amount": 0.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "INS-001-VOID",
+          "clause_type": "policy_void",
+          "text": "This policy is void if the insured admits liability in writing or contractually waives its right to contest liability without prior written consent of the insurer.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "MSA-001",
+      "source_clause_id": "MSA-001-FM",
+      "target_contract": "INS-001",
+      "target_clause_id": "INS-001-VOID",
+      "edge_type": "mutual_exclusion",
+      "description": "Invoking Force Majeure on MSA-001 constitutes an admission of inability to perform, which voids the insurance policy under INS-001-VOID.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "CP-001",
+      "name": "GlobalRetail Inc.",
+      "role": "primary_client",
+      "profile": "cooperative",
+      "relationship_health": 0.85,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-002",
+      "name": "Apex Insurance Group",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "DL-001",
+      "description": "Send Force Majeure notice to GlobalRetail Inc. (48-hour window)",
+      "contract_id": "MSA-001",
+      "clause_id": "MSA-001-FM",
+      "due_day": 2,
+      "penalty_if_missed": 100000.0,
+      "status": "active",
+      "consequence_description": "If notice not sent, SLA penalties ($100K) become immediately due."
+    },
+    {
+      "deadline_id": "DL-002",
+      "description": "File insurance claim with Apex Insurance Group (72-hour window)",
+      "contract_id": "INS-001",
+      "clause_id": "INS-001-CLAIM",
+      "due_day": 3,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Missing this deadline voids all insurance coverage for this incident."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "SHOCK-001",
+      "category": "supply_chain",
+      "title": "Datacenter Cooling Failure — Service Outage",
+      "description": "Your primary datacenter provider reports a catastrophic cooling system failure causing complete service outage. All NovaTech client-facing systems are down. GlobalRetail Inc. is already experiencing business losses and their legal team has been notified. SLA penalty clock is running. You have 48 hours to invoke Force Majeure or the $100,000 SLA penalty becomes due. However, WARNING: invoking Force Majeure may impact your insurance coverage — check your contracts carefully.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": 0.0,
+      "triggered_obligations": ["MSA-001-SLA", "MSA-001-FM", "INS-001-CLAIM"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "MSG-001",
+      "day_received": 1,
+      "sender": "GlobalRetail Inc. Legal",
+      "subject": "URGENT: Service Outage — SLA Breach Notice",
+      "body": "This notice is to formally advise that NovaTech Solutions Ltd. is in breach of Section 4.1 (Service Level Agreement) of the Master Service Agreement dated January 1, 2024. We are tracking 6 hours of complete downtime as of this notice. Penalties of $5,000/hour are accruing. Please respond within 24 hours.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 2,
+      "read": false
+    },
+    {
+      "message_id": "MSG-002",
+      "day_received": 1,
+      "sender": "IT Operations",
+      "subject": "Datacenter Status Update",
+      "body": "The datacenter provider estimates 18-24 hours to restore cooling. Total downtime will likely exceed 20 hours. At $5,000/hour, maximum SLA penalty exposure is $100,000. Recommend legal review of Force Majeure clause options.",
+      "is_legal_notice": false,
+      "requires_response_by_day": null,
+      "read": false
+    }
+  ]
+}

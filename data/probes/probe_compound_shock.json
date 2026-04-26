@@ -1,0 +1,126 @@
+{
+  "probe_id": "probe_compound_shock",
+  "failure_mode": "compound_shock",
+  "description": "Two shocks hit simultaneously on Day 1. Agent must correctly prioritise and handle both without letting either cascade.",
+  "company_name": "ProbeTest Corp Iota",
+  "industry": "Logistics",
+  "initial_cash": 3500000.0,
+  "survival_target_days": 12,
+  "initial_ar": 500000.0,
+  "initial_ap": 200000.0,
+  "credit_facility": 1000000.0,
+  "debt_covenant_min_cash": 1200000.0,
+  "contracts": [
+    {
+      "contract_id": "CS-SUPPLY",
+      "contract_type": "Supply Agreement",
+      "parties": [
+        "ProbeTest Corp Iota",
+        "SupplierA"
+      ],
+      "jurisdiction": "TX",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "CS-SUPPLY-FM",
+          "clause_type": "force_majeure",
+          "text": "FM notice required within 3 days of triggering event.",
+          "penalty_amount": 300000.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "CS-CLIENT",
+      "contract_type": "Client Service Agreement",
+      "parties": [
+        "ProbeTest Corp Iota",
+        "ClientB"
+      ],
+      "jurisdiction": "NY",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "CS-CLIENT-DPA",
+          "clause_type": "data_protection",
+          "text": "Data breach notification to ClientB required within 48 hours. Failure incurs ,000 penalty.",
+          "penalty_amount": 200000.0,
+          "deadline_days": 2,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [],
+  "counterparties": [
+    {
+      "counterparty_id": "CS-CP-001",
+      "name": "SupplierA",
+      "role": "supplier",
+      "profile": "cooperative",
+      "relationship_health": 0.8,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CS-CP-002",
+      "name": "ClientB",
+      "role": "key_client",
+      "profile": "litigious",
+      "relationship_health": 0.7,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "CS-DL-001",
+      "description": "Data breach notification to ClientB (48h)",
+      "contract_id": "CS-CLIENT",
+      "clause_id": "CS-CLIENT-DPA",
+      "due_day": 2,
+      "penalty_if_missed": 200000.0,
+      "status": "active",
+      "consequence_description": " penalty + potential litigation."
+    },
+    {
+      "deadline_id": "CS-DL-002",
+      "description": "FM notice to SupplierA (3 days)",
+      "contract_id": "CS-SUPPLY",
+      "clause_id": "CS-SUPPLY-FM",
+      "due_day": 3,
+      "penalty_if_missed": 300000.0,
+      "status": "active",
+      "consequence_description": " supply failure penalty."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "CS-SHOCK-1",
+      "category": "cybersecurity",
+      "title": "Simultaneous Data Breach + Supply Disruption",
+      "description": "Two crises hit simultaneously: (1) A data breach has compromised ClientB records \u2014 48h notification window. (2) A supplier strike at SupplierA halts supply \u2014 3-day FM window. Agent must handle BOTH within their respective deadlines. Prioritise the shorter deadline first.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -50000.0,
+      "triggered_obligations": [
+        "CS-CLIENT-DPA",
+        "CS-SUPPLY-FM"
+      ]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "CS-MSG",
+      "day_received": 1,
+      "sender": "Operations + IT Security",
+      "subject": "CRITICAL: Two Simultaneous Incidents \u2014 Data Breach + Supplier Strike",
+      "body": "We have two simultaneous emergencies: (1) IT Security reports a data breach affecting ClientB records \u2014 our DPA requires 48h notification. (2) Operations reports SupplierA workers have gone on strike \u2014 our FM clause requires 3-day notice. Both are urgent. Prioritise based on deadlines.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 1,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "both_deadlines_met_in_correct_order",
+  "probe_fail_condition": "either_deadline_missed"
+}

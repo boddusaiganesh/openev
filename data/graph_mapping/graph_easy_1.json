@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "description": "Graph mapping scenario: agent given 3 contracts, must identify all dependency edges.",
+    "source": "Derived from task_5_cascade_medium/scenario_1.json dependency_edges",
+    "ground_truth_edge_count": 3,
+    "tier": 3
+  },
+  "scenario_id": "graph_easy_1",
+  "contracts": [
+    {
+      "contract_id": "GM-MSA-001",
+      "contract_type": "Master Service Agreement",
+      "summary": "Service agreement with $300K SLA penalty for breach. Force Majeure clause valid for government-mandated disruptions. Requires 5-day written notice.",
+      "key_clauses": [
+        {"clause_id": "GM-MSA-FM", "type": "force_majeure", "snippet": "FM events include government-mandated restrictions. Notice required within 5 business days."},
+        {"clause_id": "GM-MSA-SLA", "type": "liquidated_damages", "snippet": "SLA breach triggers $300,000 penalty payable within 7 days."}
+      ]
+    },
+    {
+      "contract_id": "GM-LOAN-001",
+      "contract_type": "Revolving Credit Facility",
+      "summary": "Loan with minimum cash covenant of $1,000,000. Cross-default clause triggered by any judgment over $200,000 against borrower.",
+      "key_clauses": [
+        {"clause_id": "GM-LOAN-COV", "type": "financial_covenant", "snippet": "Borrower must maintain minimum cash of $1,000,000 at all times."},
+        {"clause_id": "GM-LOAN-XDEF", "type": "cross_default", "snippet": "Any judgment exceeding $200,000 constitutes an Event of Default under this facility."}
+      ]
+    },
+    {
+      "contract_id": "GM-INS-001",
+      "contract_type": "Trade Disruption Insurance",
+      "summary": "Covers up to $500K per event. Void if Force Majeure invoked on same triggering event. 48-hour claim filing deadline.",
+      "key_clauses": [
+        {"clause_id": "GM-INS-CLAIM", "type": "claim_filing", "snippet": "Claims must be filed within 48 hours of the triggering event."},
+        {"clause_id": "GM-INS-EXCL", "type": "coverage_exclusion", "snippet": "Coverage is void if policyholder has invoked Force Majeure in connection with the same event."}
+      ]
+    }
+  ],
+  "time_budget_steps": 8,
+  "ground_truth_edges": [
+    {
+      "edge_id": "GT-E1",
+      "source_contract": "GM-MSA-001",
+      "source_clause": "GM-MSA-SLA",
+      "target_contract": "GM-LOAN-001",
+      "target_clause": "GM-LOAN-COV",
+      "edge_type": "cascade_trigger",
+      "severity": "high",
+      "description": "Paying the $300K SLA penalty drops cash below the $1M covenant threshold, triggering a loan default."
+    },
+    {
+      "edge_id": "GT-E2",
+      "source_contract": "GM-MSA-001",
+      "source_clause": "GM-MSA-FM",
+      "target_contract": "GM-INS-001",
+      "target_clause": "GM-INS-EXCL",
+      "edge_type": "mutual_exclusion",
+      "severity": "critical",
+      "description": "Invoking Force Majeure on the MSA voids the insurance policy for the same event."
+    },
+    {
+      "edge_id": "GT-E3",
+      "source_contract": "GM-LOAN-001",
+      "source_clause": "GM-LOAN-XDEF",
+      "target_contract": "GM-LOAN-001",
+      "target_clause": "GM-LOAN-COV",
+      "edge_type": "condition_precedent",
+      "severity": "critical",
+      "description": "Any external judgment over $200K triggers cross-default even if cash covenant is met."
+    }
+  ]
+}

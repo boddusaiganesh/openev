@@ -1,0 +1,370 @@
+{
+  "scenario_id": "cascade_hard_1",
+  "company_name": "Vanguard Industrial Holdings",
+  "industry": "Advanced Manufacturing / Aerospace Components",
+  "initial_cash": 5000000.0,
+  "survival_target_days": 30,
+  "initial_ar": 2000000.0,
+  "initial_ap": 600000.0,
+  "credit_facility": 2000000.0,
+  "debt_covenant_min_cash": 1500000.0,
+  "contracts": [
+    {
+      "contract_id": "SUPPLY-001",
+      "contract_type": "Exclusive Supply Agreement",
+      "parties": ["Vanguard Industrial Holdings", "TitanChip Corp."],
+      "jurisdiction": "State of Texas",
+      "effective_date": "2022-01-01",
+      "clauses": [
+        {
+          "clause_id": "SUPPLY-001-EXCL",
+          "clause_type": "exclusivity",
+          "text": "TitanChip is the exclusive supplier of micro-control units (MCUs). Vanguard may not source MCUs from alternative suppliers without 60-day written notice.",
+          "penalty_amount": 300000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "SUPPLY-001-FM",
+          "clause_type": "force_majeure",
+          "text": "Either party may invoke Force Majeure for government-mandated trade restrictions. Notice must be given within 5 business days.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "SUPPLY-001-PENALTY",
+          "clause_type": "supply_failure",
+          "text": "Failure to deliver scheduled MCU shipments incurs a penalty of $50,000 per week of delay, up to $500,000.",
+          "penalty_amount": 500000.0,
+          "deadline_days": 7,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "AERO-001",
+      "contract_type": "Aerospace Components Delivery Contract",
+      "parties": ["Vanguard Industrial Holdings", "AeroDyne Systems"],
+      "jurisdiction": "State of Virginia",
+      "effective_date": "2022-06-01",
+      "clauses": [
+        {
+          "clause_id": "AERO-001-DELIVERY",
+          "clause_type": "delivery_obligation",
+          "text": "Vanguard shall deliver 500 MCU assemblies per month. Failure triggers liquidated damages of $100,000 per week of delay.",
+          "penalty_amount": 400000.0,
+          "deadline_days": 10,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "AERO-001-FM",
+          "clause_type": "force_majeure",
+          "text": "Force Majeure is available only if Vanguard provides written notice within 3 business days and demonstrates the event is a qualifying event under Section 14.",
+          "penalty_amount": 0.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "AERO-001-TERM",
+          "clause_type": "termination_for_cause",
+          "text": "AeroDyne may terminate immediately and seek lost profits if Vanguard fails to deliver for two consecutive months.",
+          "penalty_amount": 2000000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "LOAN-002",
+      "contract_type": "Revolving Credit Facility",
+      "parties": ["Vanguard Industrial Holdings", "Pacific Capital Partners"],
+      "jurisdiction": "New York",
+      "effective_date": "2021-01-01",
+      "clauses": [
+        {
+          "clause_id": "LOAN-002-COVENANT",
+          "clause_type": "financial_covenant",
+          "text": "Borrower must maintain minimum cash of $1,500,000 and a debt-to-equity ratio below 3.0. Breach is an Event of Default. Bank may accelerate all outstanding debt.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "LOAN-002-WAIVER",
+          "clause_type": "covenant_waiver",
+          "text": "Waiver of covenant breach requires written request and Bank approval. Waiver requests must be submitted prior to the breach event where possible.",
+          "penalty_amount": 0.0,
+          "deadline_days": 8,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "LOAN-002-CROSS",
+          "clause_type": "cross_default",
+          "text": "A material breach of any other credit agreement or a judgment in excess of $500,000 against Borrower constitutes a cross-default under this facility.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "INS-003",
+      "contract_type": "Trade Disruption Insurance Policy",
+      "parties": ["Vanguard Industrial Holdings", "Lloyd's Syndicate 5000"],
+      "jurisdiction": "UK",
+      "effective_date": "2022-01-01",
+      "clauses": [
+        {
+          "clause_id": "INS-003-CLAIM",
+          "clause_type": "claim_filing",
+          "text": "Claims arising from government-mandated trade restrictions must be filed within 5 business days of the restriction announcement.",
+          "penalty_amount": 0.0,
+          "deadline_days": 5,
+          "is_invokable": true,
+          "invoked": false
+        },
+        {
+          "clause_id": "INS-003-FM",
+          "clause_type": "coverage_exclusion",
+          "text": "Coverage is void if the insured has already invoked Force Majeure in connection with the same triggering event under any supply contract.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "EMPLOY-001",
+      "contract_type": "Key Person Employment Agreement",
+      "parties": ["Vanguard Industrial Holdings", "Dr. Elena Voss (Chief Engineer)"],
+      "jurisdiction": "State of Texas",
+      "effective_date": "2020-01-01",
+      "clauses": [
+        {
+          "clause_id": "EMPLOY-001-RETENTION",
+          "clause_type": "retention_bonus",
+          "text": "Dr. Voss is entitled to a $200,000 retention bonus payable on January 1 each year, conditional on continued employment.",
+          "penalty_amount": 200000.0,
+          "deadline_days": 15,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "EMPLOY-001-KEYMAN",
+          "clause_type": "key_person",
+          "text": "AeroDyne Systems' delivery contract (AERO-001) contains a key-person clause requiring Dr. Voss's continued involvement. Departure triggers AeroDyne's right to terminate AERO-001 immediately.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "SUPPLY-001",
+      "source_clause_id": "SUPPLY-001-FM",
+      "target_contract": "INS-003",
+      "target_clause_id": "INS-003-FM",
+      "edge_type": "mutual_exclusion",
+      "description": "Invoking Force Majeure on SUPPLY-001 voids the Trade Disruption Insurance (INS-003). Agent must choose: FM protection OR insurance coverage — not both.",
+      "discovered": false
+    },
+    {
+      "source_contract": "SUPPLY-001",
+      "source_clause_id": "SUPPLY-001-PENALTY",
+      "target_contract": "AERO-001",
+      "target_clause_id": "AERO-001-DELIVERY",
+      "edge_type": "cascade_trigger",
+      "description": "TitanChip supply failure causes Vanguard delivery failure to AeroDyne — $500K vendor penalties AND $400K client LD stack if FM not invoked in time.",
+      "discovered": false
+    },
+    {
+      "source_contract": "AERO-001",
+      "source_clause_id": "AERO-001-DELIVERY",
+      "target_contract": "LOAN-002",
+      "target_clause_id": "LOAN-002-CROSS",
+      "edge_type": "cascade_trigger",
+      "description": "An AeroDyne liquidated damages judgment over $500K triggers the cross-default clause in LOAN-002, allowing Pacific Capital to accelerate all debt.",
+      "discovered": false
+    },
+    {
+      "source_contract": "EMPLOY-001",
+      "source_clause_id": "EMPLOY-001-KEYMAN",
+      "target_contract": "AERO-001",
+      "target_clause_id": "AERO-001-TERM",
+      "edge_type": "condition_precedent",
+      "description": "If Dr. Voss leaves (triggered if retention bonus is not paid by Day 15), AeroDyne can invoke AERO-001-TERM immediately — $2M termination liability.",
+      "discovered": false
+    },
+    {
+      "source_contract": "AERO-001",
+      "source_clause_id": "AERO-001-FM",
+      "target_contract": "SUPPLY-001",
+      "target_clause_id": "SUPPLY-001-FM",
+      "edge_type": "condition_precedent",
+      "description": "Vanguard's FM notice to AeroDyne (Day 3 deadline) must reference same force majeure event as SUPPLY-001-FM notice — inconsistent notices invalidate both.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "CP-009",
+      "name": "TitanChip Corp.",
+      "role": "exclusive_supplier",
+      "profile": "cooperative",
+      "relationship_health": 0.6,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-010",
+      "name": "AeroDyne Systems",
+      "role": "primary_client",
+      "profile": "aggressive",
+      "relationship_health": 0.75,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-011",
+      "name": "Pacific Capital Partners",
+      "role": "primary_lender",
+      "profile": "aggressive",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    },
+    {
+      "counterparty_id": "CP-012",
+      "name": "Lloyd's Syndicate 5000",
+      "role": "insurer",
+      "profile": "bureaucratic",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "DL-010",
+      "description": "Send Force Majeure notice to AeroDyne Systems (3 business day window)",
+      "contract_id": "AERO-001",
+      "clause_id": "AERO-001-FM",
+      "due_day": 3,
+      "penalty_if_missed": 400000.0,
+      "status": "active",
+      "consequence_description": "Missing FM notice means full $400K LDs become due from Day 10."
+    },
+    {
+      "deadline_id": "DL-011",
+      "description": "File Trade Disruption Insurance claim with Lloyd's (5 business day window)",
+      "contract_id": "INS-003",
+      "clause_id": "INS-003-CLAIM",
+      "due_day": 5,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Missing claim window forfeits up to $1.5M insurance recovery."
+    },
+    {
+      "deadline_id": "DL-012",
+      "description": "Send Force Majeure notice to TitanChip Corp. (5 business days)",
+      "contract_id": "SUPPLY-001",
+      "clause_id": "SUPPLY-001-FM",
+      "due_day": 5,
+      "penalty_if_missed": 500000.0,
+      "status": "active",
+      "consequence_description": "Without FM notice, $500K supply failure penalty accrues from Day 7. BUT invoking FM here voids Lloyd's insurance."
+    },
+    {
+      "deadline_id": "DL-013",
+      "description": "Request covenant waiver from Pacific Capital Partners (Day 8 window)",
+      "contract_id": "LOAN-002",
+      "clause_id": "LOAN-002-WAIVER",
+      "due_day": 8,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Without waiver, covenant breach on Day 12 triggers credit facility freeze."
+    },
+    {
+      "deadline_id": "DL-014",
+      "description": "Pay Dr. Elena Voss retention bonus ($200K) — due Day 15",
+      "contract_id": "EMPLOY-001",
+      "clause_id": "EMPLOY-001-RETENTION",
+      "due_day": 15,
+      "penalty_if_missed": 2000000.0,
+      "status": "active",
+      "consequence_description": "Non-payment triggers Dr. Voss departure, which activates AeroDyne's $2M termination right via key-person clause."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "SHOCK-004",
+      "category": "supply_chain",
+      "title": "US-China Trade War — MCU Export Embargo",
+      "description": "The US Department of Commerce has imposed an immediate export embargo on all micro-control units manufactured in Taiwan (TitanChip Corp.'s exclusive manufacturing base). TitanChip cannot ship ANY MCUs to Vanguard until the embargo lifts — estimated 60-90 days. Vanguard's production line halts immediately. AeroDyne delivery obligations are at risk. The embargo is a qualifying Force Majeure event — BUT invoking FM on the supply contract will void your Lloyd's insurance. You have 3 days to notify AeroDyne and 5 days to decide on TitanChip FM and Lloyd's claim. Hidden: Dr. Voss's retention bonus ($200K) is due Day 15 — missing it triggers a $2M cascade through the key-person clause. Cross-reference all 5 contracts before acting.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": -80000.0,
+      "triggered_obligations": ["SUPPLY-001-FM", "AERO-001-FM", "INS-003-CLAIM"]
+    },
+    {
+      "shock_id": "SHOCK-005",
+      "category": "reputational",
+      "title": "Whistleblower Report — Component Quality Concerns",
+      "description": "On Day 14, a former Vanguard engineer files a whistleblower complaint with the FAA alleging that a batch of MCU assemblies shipped to AeroDyne in Q3 may have quality defects. AeroDyne's legal team immediately invokes their audit rights. This adds a product liability exposure and accelerates AeroDyne's termination threat under AERO-001-TERM. Your reputation score drops. Pacific Capital is watching.",
+      "occurs_on_day": 14,
+      "immediate_cash_impact": -100000.0,
+      "triggered_obligations": ["AERO-001-TERM"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "MSG-008",
+      "day_received": 1,
+      "sender": "TitanChip Corp. Legal",
+      "subject": "URGENT: MCU Export Embargo — Force Majeure Declaration",
+      "body": "TitanChip Corp. hereby provides notice of a Force Majeure event under Section 14 of our Exclusive Supply Agreement. The US Department of Commerce export embargo on Taiwan-origin MCUs, effective today, constitutes a qualifying event. We are unable to fulfill scheduled shipments until the embargo is lifted. We will keep you informed of developments.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 3,
+      "read": false
+    },
+    {
+      "message_id": "MSG-009",
+      "day_received": 1,
+      "sender": "Supply Chain Operations",
+      "subject": "Production Halt — MCU Inventory Depleted in 48 Hours",
+      "body": "Current MCU inventory will be exhausted in approximately 48 hours. Production will halt completely. AeroDyne monthly delivery is due in 10 days. We have no alternative supplier options under the current exclusivity agreement. Legal review of FM options and alternative sourcing rights needed immediately.",
+      "is_legal_notice": false,
+      "requires_response_by_day": null,
+      "read": false
+    },
+    {
+      "message_id": "MSG-010",
+      "day_received": 2,
+      "sender": "AeroDyne Systems Contracts",
+      "subject": "Delivery Schedule Inquiry",
+      "body": "Vanguard, we are tracking news of the MCU embargo. Please advise immediately on the status of our Month 1 delivery of 500 MCU assemblies due in 10 days. We expect written confirmation of your delivery status and any Force Majeure claims by Day 3 per our agreement.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 3,
+      "read": false
+    },
+    {
+      "message_id": "MSG-011",
+      "day_received": 3,
+      "sender": "Pacific Capital Partners Risk Team",
+      "subject": "Covenant Monitoring — Trade Disruption Watch",
+      "body": "In light of current supply chain disruptions in your sector, we are placing your account on covenant monitoring status. Please provide a 30-day cash flow projection by Day 10. We remind you that the minimum cash covenant of $1.5M must be maintained at all times.",
+      "is_legal_notice": false,
+      "requires_response_by_day": 10,
+      "read": false
+    }
+  ]
+}

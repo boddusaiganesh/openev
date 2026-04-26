@@ -1,0 +1,64 @@
+{
+  "contract_meta": {
+    "contract_type": "Joint Venture Agreement",
+    "parties": ["Innovate Partners LLC", "Capital Ventures Inc"],
+    "jurisdiction": "State of Illinois",
+    "effective_date": "2024-05-01"
+  },
+  "clauses": [
+    {
+      "text": "Each party shall indemnify, defend, and hold harmless the other party from any claims arising out of such party's breach of this Agreement or negligence in performing its obligations hereunder.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["overly_broad_scope"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "defend", "hold harmless", "negligence"],
+      "difficulty_note": "Indemnification is broad and may need limitation"
+    },
+    {
+      "text": "The term of this Agreement shall be five years from the Effective Date and shall automatically renew for successive one-year periods unless either party provides written notice of non-renewal at least ninety days prior to the end of the then-current term.",
+      "clause_type": "termination",
+      "risk_level": "high",
+      "issues": ["automatic_renewal", "missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["five years", "automatically renew", "ninety days"],
+      "difficulty_note": "Auto-renewal could lock parties in indefinitely"
+    },
+    {
+      "text": "Neither party shall be liable to the other for any indirect, incidental, consequential, or punitive damages arising out of this Agreement, regardless of the theory of liability.",
+      "clause_type": "limitation_of_liability",
+      "risk_level": "medium",
+      "issues": ["missing_liability_cap"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["indirect", "incidental", "consequential", "punitive damages"],
+      "difficulty_note": "Should include a liability cap"
+    },
+    {
+      "text": "All intellectual property developed jointly by the parties under this Agreement shall be jointly owned by both parties, with each party having the right to use such intellectual property without accounting to the other.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["jointly owned", "intellectual property", "without accounting"],
+      "difficulty_note": "Fair joint IP ownership"
+    },
+    {
+      "text": "Each party represents and warrants that it has full power and authority to enter into this Agreement and perform its obligations hereunder.",
+      "clause_type": "representations",
+      "risk_level": "medium",
+      "issues": ["vague_language"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["represents and warrants", "full power and authority", "power and authority"],
+      "difficulty_note": "Should specify what power and authority means"
+    },
+    {
+      "text": "This Agreement shall be governed by the laws of the State of Illinois, without regard to conflict of law principles.",
+      "clause_type": "governing_law",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["governed by", "laws of Illinois"],
+      "difficulty_note": "Standard governing law"
+    }
+  ]
+}

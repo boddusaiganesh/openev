@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "bridge_type": "cuad_to_lexdomino",
+    "description": "CUAD-derived scenario: real FM + Indemnification clause text from a Master Service Agreement used as both Tier 1 QA source and LexDomino crisis foundation.",
+    "cuad_source": "builtin-001 / builtin-008 equivalent",
+    "tiers_covered": [1, 3, 4],
+    "academic_note": "Same contract text tested at T1 (can agent read it?), T3 (can agent find the FM->Insurance edge?), T4 (can agent act on it during a crisis?)."
+  },
+  "tier1_qa_pairs": [
+    {
+      "sample_id": "bridge-msa-001-fm",
+      "contract_name": "BridgeCorp_MasterServiceAgreement",
+      "question_category": "Force Majeure",
+      "context": "Section 14. Force Majeure. Neither party shall be liable for any failure or delay in performance under this Agreement to the extent said failures or delays are proximately caused by causes beyond that party's reasonable control and occurring without its fault or negligence, including, without limitation, acts of God, fire, flood, government-mandated trade restrictions, or labor strikes. The affected party shall provide written notice within five (5) business days of the occurrence of the force majeure event. Failure to provide timely notice shall constitute a waiver of Force Majeure rights under this Agreement.",
+      "question": "Force Majeure",
+      "ground_truth": [
+        "Neither party shall be liable for any failure or delay in performance under this Agreement to the extent said failures or delays are proximately caused by causes beyond that party's reasonable control and occurring without its fault or negligence, including, without limitation, acts of God, fire, flood, government-mandated trade restrictions, or labor strikes."
+      ],
+      "has_answer": true
+    },
+    {
+      "sample_id": "bridge-msa-001-indemnify",
+      "contract_name": "BridgeCorp_MasterServiceAgreement",
+      "question_category": "Indemnification",
+      "context": "Section 11. Indemnification. Each party (the 'Indemnifying Party') shall defend, indemnify, and hold harmless the other party, its officers, directors, employees, and agents (collectively, the 'Indemnified Party') from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to the Indemnifying Party's breach of this Agreement or the negligent or willful acts of its personnel. The indemnification obligation shall survive the termination of this Agreement.",
+      "question": "Indemnification",
+      "ground_truth": [
+        "Each party (the 'Indemnifying Party') shall defend, indemnify, and hold harmless the other party, its officers, directors, employees, and agents (collectively, the 'Indemnified Party') from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to the Indemnifying Party's breach of this Agreement or the negligent or willful acts of its personnel."
+      ],
+      "has_answer": true
+    },
+    {
+      "sample_id": "bridge-msa-001-insurance",
+      "contract_name": "BridgeCorp_TradeInsurancePolicy",
+      "question_category": "Insurance",
+      "context": "Section 5. Coverage and Exclusions. The insurer shall indemnify BridgeCorp against all direct losses arising from trade disruption events up to a maximum of $1,500,000 per occurrence. Coverage is void if BridgeCorp has invoked Force Majeure in connection with the same triggering event under any supply or service contract. Claims must be filed in writing within 48 hours of the triggering event.",
+      "question": "Insurance",
+      "ground_truth": [
+        "The insurer shall indemnify BridgeCorp against all direct losses arising from trade disruption events up to a maximum of $1,500,000 per occurrence."
+      ],
+      "has_answer": true
+    }
+  ],
+  "lexdomino_scenario": {
+    "scenario_id": "bridge_msa_cuad_001",
+    "company_name": "BridgeCorp Technologies",
+    "industry": "Technology Services",
+    "initial_cash": 3500000.0,
+    "survival_target_days": 15,
+    "initial_ar": 600000.0,
+    "initial_ap": 120000.0,
+    "credit_facility": 1000000.0,
+    "debt_covenant_min_cash": 900000.0,
+    "contracts": [
+      {
+        "contract_id": "BRIDGE-MSA-001",
+        "contract_type": "Master Service Agreement",
+        "parties": ["BridgeCorp Technologies", "EnterpriseClient Corp"],
+        "jurisdiction": "Delaware",
+        "effective_date": "2023-06-01",
+        "clauses": [
+          {
+            "clause_id": "BRIDGE-MSA-FM",
+            "clause_type": "force_majeure",
+            "text": "Neither party shall be liable for any failure or delay in performance under this Agreement to the extent said failures or delays are proximately caused by causes beyond that party's reasonable control and occurring without its fault or negligence, including, without limitation, acts of God, fire, flood, government-mandated trade restrictions, or labor strikes. The affected party shall provide written notice within five (5) business days of the occurrence of the force majeure event. Failure to provide timely notice shall constitute a waiver of Force Majeure rights under this Agreement.",
+            "penalty_amount": 0.0,
+            "deadline_days": 5,
+            "is_invokable": true,
+            "invoked": false
+          },
+          {
+            "clause_id": "BRIDGE-MSA-PENALTY",
+            "clause_type": "liquidated_damages",
+            "text": "Failure to deliver agreed services by the contractual milestone date incurs liquidated damages of $400,000 payable within 7 days.",
+            "penalty_amount": 400000.0,
+            "deadline_days": 7,
+            "is_invokable": false,
+            "invoked": false
+          },
+          {
+            "clause_id": "BRIDGE-MSA-INDEMNIFY",
+            "clause_type": "indemnification",
+            "text": "Each party shall defend, indemnify, and hold harmless the other party from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to the indemnifying party's breach of this Agreement.",
+            "penalty_amount": 0.0,
+            "deadline_days": null,
+            "is_invokable": false,
+            "invoked": false
+          }
+        ]
+      },
+      {
+        "contract_id": "BRIDGE-INS-001",
+        "contract_type": "Trade Disruption Insurance",
+        "parties": ["BridgeCorp Technologies", "GlobalInsurer Ltd"],
+        "jurisdiction": "New York",
+        "effective_date": "2023-01-01",
+        "clauses": [
+          {
+            "clause_id": "BRIDGE-INS-CLAIM",
+            "clause_type": "claim_filing",
+            "text": "Claims must be filed in writing within 48 hours of the triggering event. Coverage: $1,500,000 per occurrence.",
+            "penalty_amount": 0.0,
+            "deadline_days": 2,
+            "is_invokable": true,
+            "invoked": false
+          },
+          {
+            "clause_id": "BRIDGE-INS-EXCLUSION",
+            "clause_type": "coverage_exclusion",
+            "text": "Coverage is void if BridgeCorp has invoked Force Majeure in connection with the same triggering event under any supply or service contract.",
+            "penalty_amount": 0.0,
+            "deadline_days": null,
+            "is_invokable": false,
+            "invoked": false
+          }
+        ]
+      }
+    ],
+    "dependency_edges": [
+      {
+        "source_contract": "BRIDGE-MSA-001",
+        "source_clause_id": "BRIDGE-MSA-FM",
+        "target_contract": "BRIDGE-INS-001",
+        "target_clause_id": "BRIDGE-INS-EXCLUSION",
+        "edge_type": "mutual_exclusion",
+        "description": "Invoking Force Majeure on the MSA voids the insurance policy. Agent must file insurance BEFORE invoking FM.",
+        "discovered": false
+      }
+    ],
+    "counterparties": [
+      {
+        "counterparty_id": "BRIDGE-CP-001",
+        "name": "EnterpriseClient Corp",
+        "role": "key_client",
+        "profile": "litigious",
+        "relationship_health": 0.6,
+        "risk_profile_revealed": false
+      },
+      {
+        "counterparty_id": "BRIDGE-CP-002",
+        "name": "GlobalInsurer Ltd",
+        "role": "insurer",
+        "profile": "bureaucratic",
+        "relationship_health": 1.0,
+        "risk_profile_revealed": false
+      }
+    ],
+    "deadlines": [
+      {
+        "deadline_id": "BRIDGE-DL-001",
+        "description": "File insurance claim within 48 hours (before any FM invocation)",
+        "contract_id": "BRIDGE-INS-001",
+        "clause_id": "BRIDGE-INS-CLAIM",
+        "due_day": 2,
+        "penalty_if_missed": 1500000.0,
+        "status": "active",
+        "consequence_description": "Forfeits $1.5M coverage. Also voided if FM invoked first."
+      }
+    ],
+    "shock_events": [
+      {
+        "shock_id": "BRIDGE-SHOCK-001",
+        "category": "supply_chain",
+        "title": "Government Trade Embargo — Delivery Disruption",
+        "description": "A government trade embargo has disrupted BridgeCorp's supply chain, triggering both the MSA Force Majeure clause and the insurance claim window simultaneously. CRITICAL: invoking FM on the MSA will void the insurance. File insurance FIRST.",
+        "occurs_on_day": 1,
+        "immediate_cash_impact": -80000.0,
+        "triggered_obligations": ["BRIDGE-MSA-FM", "BRIDGE-INS-CLAIM"]
+      }
+    ],
+    "initial_inbox": [
+      {
+        "message_id": "BRIDGE-MSG-001",
+        "day_received": 1,
+        "sender": "Legal Department",
+        "subject": "URGENT: Trade Embargo — FM and Insurance Decision Required Within 48h",
+        "body": "A government trade embargo has disrupted our service delivery. We have two simultaneous obligations: (1) Invoke Force Majeure on the MSA within 5 days, (2) File insurance claim within 48 hours. Legal advises these may conflict — review both contracts carefully before acting.",
+        "is_legal_notice": false,
+        "requires_response_by_day": 2,
+        "read": false
+      }
+    ]
+  }
+}

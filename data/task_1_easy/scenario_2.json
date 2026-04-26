@@ -1,0 +1,46 @@
+{
+  "contract_meta": {
+    "contract_type": "Consulting Agreement",
+    "parties": ["TechConsult Inc", "Acme Corp"],
+    "jurisdiction": "State of Texas",
+    "effective_date": "2024-02-01"
+  },
+  "clauses": [
+    {
+      "text": "Consultant shall maintain in strict confidence all proprietary information disclosed by Client during the term of this Agreement and shall not disclose such information to any third party without prior written consent.",
+      "clause_type": "confidentiality",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["proprietary information", "strict confidence", "written consent"],
+      "difficulty_note": "Standard confidentiality clause"
+    },
+    {
+      "text": "Either party may terminate this Agreement at any time upon thirty days prior written notice to the other party.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["terminate", "thirty days", "written notice"],
+      "difficulty_note": "Simple termination provision"
+    },
+    {
+      "text": "This Agreement shall be governed by the laws of the State of Texas, without regard to conflict of law principles.",
+      "clause_type": "governing_law",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["governed by", "laws of Texas", "conflict of law"],
+      "difficulty_note": "Standard governing law clause"
+    },
+    {
+      "text": "Neither party shall be liable for any failure or delay in performance due to circumstances beyond its reasonable control, including acts of God, natural disasters, or government actions.",
+      "clause_type": "force_majeure",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["force majeure", "beyond reasonable control", "acts of God"],
+      "difficulty_note": "Standard force majeure provision"
+    }
+  ]
+}

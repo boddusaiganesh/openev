@@ -1,0 +1,242 @@
+{
+  "passive_baseline": {
+    "tier_scores": [
+      {
+        "tier": "tier1_reading",
+        "raw_score": 0.01,
+        "weighted_contribution": 0.0015,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier2_classification",
+        "raw_score": 0.4,
+        "weighted_contribution": 0.06,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier3_dependency",
+        "raw_score": 0.1,
+        "weighted_contribution": 0.02,
+        "weight": 0.2,
+        "details": {}
+      },
+      {
+        "tier": "tier4_cascade_easy",
+        "raw_score": 0.6966,
+        "weighted_contribution": 0.0871,
+        "weight": 0.125,
+        "details": {}
+      },
+      {
+        "tier": "tier5_cascade_medium",
+        "raw_score": 0.5233,
+        "weighted_contribution": 0.0916,
+        "weight": 0.175,
+        "details": {}
+      },
+      {
+        "tier": "tier6_cascade_hard",
+        "raw_score": 0.1045,
+        "weighted_contribution": 0.0209,
+        "weight": 0.2,
+        "details": {}
+      }
+    ],
+    "probe_results": [],
+    "legal_iq": 0.2811,
+    "t1_reading": 0.01,
+    "t2_classification": 0.4,
+    "t3_dependency": 0.1,
+    "t4_crisis_easy": 0.6966,
+    "t5_crisis_medium": 0.5233,
+    "t6_crisis_hard": 0.1045,
+    "t4_t5_t6_combined": 0.3991,
+    "probes_passed": 0,
+    "probes_failed": 0,
+    "probes_total": 0,
+    "failure_modes_triggered": [],
+    "label": "Fails Legal Practice Bar"
+  },
+  "first_sentence_passive": {
+    "tier_scores": [
+      {
+        "tier": "tier1_reading",
+        "raw_score": 0.15,
+        "weighted_contribution": 0.0225,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier2_classification",
+        "raw_score": 0.4,
+        "weighted_contribution": 0.06,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier3_dependency",
+        "raw_score": 0.1,
+        "weighted_contribution": 0.02,
+        "weight": 0.2,
+        "details": {}
+      },
+      {
+        "tier": "tier4_cascade_easy",
+        "raw_score": 0.6966,
+        "weighted_contribution": 0.0871,
+        "weight": 0.125,
+        "details": {}
+      },
+      {
+        "tier": "tier5_cascade_medium",
+        "raw_score": 0.5233,
+        "weighted_contribution": 0.0916,
+        "weight": 0.175,
+        "details": {}
+      },
+      {
+        "tier": "tier6_cascade_hard",
+        "raw_score": 0.1045,
+        "weighted_contribution": 0.0209,
+        "weight": 0.2,
+        "details": {}
+      }
+    ],
+    "probe_results": [],
+    "legal_iq": 0.3021,
+    "t1_reading": 0.15,
+    "t2_classification": 0.4,
+    "t3_dependency": 0.1,
+    "t4_crisis_easy": 0.6966,
+    "t5_crisis_medium": 0.5233,
+    "t6_crisis_hard": 0.1045,
+    "t4_t5_t6_combined": 0.3991,
+    "probes_passed": 0,
+    "probes_failed": 0,
+    "probes_total": 0,
+    "failure_modes_triggered": [],
+    "label": "Paralegal Level"
+  },
+  "full_context_deadline": {
+    "tier_scores": [
+      {
+        "tier": "tier1_reading",
+        "raw_score": 0.7364,
+        "weighted_contribution": 0.1105,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier2_classification",
+        "raw_score": 0.4,
+        "weighted_contribution": 0.06,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier3_dependency",
+        "raw_score": 0.1,
+        "weighted_contribution": 0.02,
+        "weight": 0.2,
+        "details": {}
+      },
+      {
+        "tier": "tier4_cascade_easy",
+        "raw_score": 0.8625,
+        "weighted_contribution": 0.1078,
+        "weight": 0.125,
+        "details": {}
+      },
+      {
+        "tier": "tier5_cascade_medium",
+        "raw_score": 0.7569,
+        "weighted_contribution": 0.1325,
+        "weight": 0.175,
+        "details": {}
+      },
+      {
+        "tier": "tier6_cascade_hard",
+        "raw_score": 0.7528,
+        "weighted_contribution": 0.1506,
+        "weight": 0.2,
+        "details": {}
+      }
+    ],
+    "probe_results": [],
+    "legal_iq": 0.5813,
+    "t1_reading": 0.7364,
+    "t2_classification": 0.4,
+    "t3_dependency": 0.1,
+    "t4_crisis_easy": 0.8625,
+    "t5_crisis_medium": 0.7569,
+    "t6_crisis_hard": 0.7528,
+    "t4_t5_t6_combined": 0.7817,
+    "probes_passed": 0,
+    "probes_failed": 0,
+    "probes_total": 0,
+    "failure_modes_triggered": [],
+    "label": "Junior Associate Level"
+  },
+  "best_available": {
+    "tier_scores": [
+      {
+        "tier": "tier1_reading",
+        "raw_score": 0.15,
+        "weighted_contribution": 0.0225,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier2_classification",
+        "raw_score": 0.4,
+        "weighted_contribution": 0.06,
+        "weight": 0.15,
+        "details": {}
+      },
+      {
+        "tier": "tier3_dependency",
+        "raw_score": 0.1,
+        "weighted_contribution": 0.02,
+        "weight": 0.2,
+        "details": {}
+      },
+      {
+        "tier": "tier4_cascade_easy",
+        "raw_score": 0.8625,
+        "weighted_contribution": 0.1078,
+        "weight": 0.125,
+        "details": {}
+      },
+      {
+        "tier": "tier5_cascade_medium",
+        "raw_score": 0.7569,
+        "weighted_contribution": 0.1325,
+        "weight": 0.175,
+        "details": {}
+      },
+      {
+        "tier": "tier6_cascade_hard",
+        "raw_score": 0.7528,
+        "weighted_contribution": 0.1506,
+        "weight": 0.2,
+        "details": {}
+      }
+    ],
+    "probe_results": [],
+    "legal_iq": 0.4933,
+    "t1_reading": 0.15,
+    "t2_classification": 0.4,
+    "t3_dependency": 0.1,
+    "t4_crisis_easy": 0.8625,
+    "t5_crisis_medium": 0.7569,
+    "t6_crisis_hard": 0.7528,
+    "t4_t5_t6_combined": 0.7817,
+    "probes_passed": 0,
+    "probes_failed": 0,
+    "probes_total": 0,
+    "failure_modes_triggered": [],
+    "label": "Paralegal Level"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "contract_meta": {
+    "contract_type": "Acquisition Agreement",
+    "parties": ["Horizon Acquisitions Inc", "Pinnacle Software LLC"],
+    "jurisdiction": "State of Delaware",
+    "effective_date": "2024-09-01"
+  },
+  "clauses": [
+    {
+      "text": "Acquirer hereby agrees to purchase from Seller, and Seller agrees to sell to Acquirer, all of the issued and outstanding shares of the Company for a purchase price of $15,000,000, subject to adjustment as set forth herein.",
+      "clause_type": "payment_terms",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["purchase price", "$15,000,000", "adjustment"],
+      "difficulty_note": "Standard purchase price clause"
+    },
+    {
+      "text": "Seller shall indemnify, defend, and hold harmless Acquirer from and against any and all claims, damages, losses, and expenses arising from or related to any breach of Seller's representations and warranties or any fraud by Seller.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "representations and warranties", "fraud"],
+      "difficulty_note": "Indemnification should have survival limits"
+    },
+    {
+      "text": "IN NO EVENT SHALL EITHER PARTY BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO THIS AGREEMENT, EXCEPT FOR BREACH OF CONFIDENTIALITY OBLIGATIONS OR INDEMNIFICATION OBLIGATIONS.",
+      "clause_type": "limitation_of_liability",
+      "risk_level": "critical",
+      "issues": ["missing_liability_cap", "one_sided_obligation"],
+      "recommended_action": "escalate_to_senior_counsel",
+      "reasoning_keywords": ["no event shall be liable", "consequential damages", "indemnification"],
+      "difficulty_note": "Broad exclusion but carves out indemnities; should add cap"
+    },
+    {
+      "text": "Seller represents and warrants that: (a) it has full power and authority to enter into this Agreement, (b) the execution and delivery of this Agreement does not conflict with any agreement to which Seller is a party, (c) there are no pending or threatened claims that could materially affect the Company, and (d) all financial statements provided to Acquirer are accurate in all material respects.",
+      "clause_type": "representations",
+      "risk_level": "medium",
+      "issues": ["vague_language", "ambiguous_definition"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["represents and warrants", "full power and authority", "materially affect"],
+      "difficulty_note": "Representations are broad and should be more specific"
+    },
+    {
+      "text": "The closing shall occur within ten business days after the satisfaction or waiver of all conditions to closing, or at such other time as the parties may mutually agree in writing.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["closing", "ten business days", "conditions to closing"],
+      "difficulty_note": "Standard closing timeframe"
+    },
+    {
+      "text": "Acquirer shall maintain commercially reasonable insurance coverage for a period of three years following the closing, including directors and officers liability insurance with limits of not less than $5,000,000.",
+      "clause_type": "insurance",
+      "risk_level": "medium",
+      "issues": ["missing_carve_out", "vague_language"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["insurance coverage", "directors and officers", "$5,000,000"],
+      "difficulty_note": "Commercially reasonable is vague; D&O coverage should be specified"
+    },
+    {
+      "text": "For a period of five years following the closing, Seller shall not directly or indirectly (a) own, manage, operate, or control any business that competes with the Company, (b) solicit any employee of the Company to leave their employment, or (c) solicit any customer of the Company to cease doing business with the Company.",
+      "clause_type": "non_compete",
+      "risk_level": "high",
+      "issues": ["overly_broad_scope", "ambiguous_definition", "missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["competes", "solicit", "five years", "customer"],
+      "difficulty_note": "Non-compete is extremely broad; five years is excessive"
+    },
+    {
+      "text": "All confidential information of the Company shall be deemed Confidential Information of Acquirer following the closing, and Seller shall protect such information using at least the same degree of care as it uses to protect its own confidential information, but in no event less than reasonable care.",
+      "clause_type": "confidentiality",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["confidential information", "reasonable care", "following the closing"],
+      "difficulty_note": "Standard post-closing confidentiality"
+    },
+    {
+      "text": "This Agreement, together with all exhibits and schedules attached hereto, constitutes the entire agreement between the parties and supersedes all prior agreements and understandings. No amendment shall be effective unless in writing and signed by both parties.",
+      "clause_type": "representations",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["entire agreement", "supersedes", "amendment", "exhibits"],
+      "difficulty_note": "Standard integration clause"
+    },
+    {
+      "text": "Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in Wilmington, Delaware administered by the American Arbitration Association. The arbitrator shall have the power to award equitable relief. Judgment on the award may be entered in any court of competent jurisdiction.",
+      "clause_type": "dispute_resolution",
+      "risk_level": "high",
+      "issues": ["silent_on_key_issue", "one_sided_obligation"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["arbitration", "Wilmington", "American Arbitration Association", "equitable relief"],
+      "difficulty_note": "Arbitration location may favor one party"
+    },
+    {
+      "text": "Seller warrants that the software products owned by the Company do not infringe any third party intellectual property rights and that to Seller's knowledge, no third party is infringing on the Company's intellectual property.",
+      "clause_type": "warranty",
+      "risk_level": "medium",
+      "issues": ["vague_language", "missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["warrants", "infringe", "intellectual property", "to Seller's knowledge"],
+      "difficulty_note": "Knowledge qualifier weakens warranty; should have clearer scope"
+    },
+    {
+      "text": "All intellectual property created by Company employees prior to closing shall remain the exclusive property of the Company. All intellectual property created by Seller in connection with the Company shall be assigned to the Company prior to closing.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["intellectual property", "exclusive property", "assigned to the Company"],
+      "difficulty_note": "Clear IP ownership provisions"
+    }
+  ]
+}

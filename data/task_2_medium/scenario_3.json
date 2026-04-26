@@ -1,0 +1,64 @@
+{
+  "contract_meta": {
+    "contract_type": "Technology License Agreement",
+    "parties": ["DataSoft Corporation", "Enterprise Solutions Ltd"],
+    "jurisdiction": "State of Massachusetts",
+    "effective_date": "2024-07-01"
+  },
+  "clauses": [
+    {
+      "text": "Licensor hereby grants to Licensee a non-exclusive, worldwide, royalty-bearing license to use the Licensed Technology solely for Licensee's internal business purposes.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["non-exclusive", "worldwide", "royalty-bearing", "internal business"],
+      "difficulty_note": "Standard license grant"
+    },
+    {
+      "text": "Licensee shall pay Licensor license fees as follows: a one-time fee of $250,000 due upon execution, and annual maintenance fees of $50,000 due on each anniversary. All fees are non-refundable.",
+      "clause_type": "payment_terms",
+      "risk_level": "high",
+      "issues": ["unreasonable_penalty"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["non-refundable", "license fees", "annual maintenance"],
+      "difficulty_note": "Non-refundable fees may be excessive"
+    },
+    {
+      "text": "Each party shall maintain appropriate insurance coverage customary for its industry and shall name the other party as additional insured upon request.",
+      "clause_type": "insurance",
+      "risk_level": "medium",
+      "issues": ["vague_language", "missing_carve_out"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["appropriate insurance", "additional insured", "customary"],
+      "difficulty_note": "Insurance requirements are vague and should specify minimums"
+    },
+    {
+      "text": "Licensor shall indemnify, defend, and hold harmless Licensee from any claims alleging that the Licensed Technology infringes any third party's intellectual property rights.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["one_sided_obligation"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "infringement", "intellectual property"],
+      "difficulty_note": "One-sided indemnification; Licensee should also be indemnified"
+    },
+    {
+      "text": "This Agreement shall remain in effect for a period of three years from the Effective Date and shall automatically renew for successive one-year terms unless either party provides notice of non-renewal at least sixty days prior to expiration.",
+      "clause_type": "termination",
+      "risk_level": "high",
+      "issues": ["automatic_renewal"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["three years", "automatically renew", "sixty days"],
+      "difficulty_note": "Auto-renewal with no cap on renewals"
+    },
+    {
+      "text": "Licensee acknowledges that the Licensed Technology is provided 'AS IS' without warranties of any kind, express or implied, including merchantability or fitness for a particular purpose.",
+      "clause_type": "warranty",
+      "risk_level": "medium",
+      "issues": ["vague_language"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["AS IS", "without warranties", "merchantability", "fitness"],
+      "difficulty_note": "Very limited warranty; consider negotiating some protections"
+    }
+  ]
+}

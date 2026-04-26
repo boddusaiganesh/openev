@@ -1,0 +1,74 @@
+name: Validate Environment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m pytest tests/ -v --tb=short -q
+
+      - name: Run grader calibration
+        run: python calibrate.py
+
+      - name: Run stress tests
+        run: python stress_test.py
+
+      - name: Run benchmarks
+        run: python benchmark.py --output benchmark_results.json
+
+      - name: Analyze benchmark scores
+        run: python analyze_results.py
+
+      - name: Run local validation
+        run: python validate.py --local
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            benchmark_results.json
+            submission_report.json
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: validate
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t contract-review-env .
+
+      - name: Start container
+        run: |
+          docker run -d -p 7860:7860 --name cr-env contract-review-env
+          sleep 10
+
+      - name: Health check
+        run: curl -f http://localhost:7860/ || exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker stop cr-env && docker rm cr-env

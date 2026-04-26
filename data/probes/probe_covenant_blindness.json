@@ -1,0 +1,118 @@
+{
+  "probe_id": "probe_covenant_blindness",
+  "failure_mode": "covenant_blindness",
+  "description": "Agent pays a $300K penalty that pushes cash below the $500K debt covenant, triggering credit freeze. Correct: request waiver BEFORE paying, or draw credit facility first.",
+  "company_name": "ProbeTest Corp Gamma",
+  "industry": "Logistics",
+  "initial_cash": 900000.0,
+  "survival_target_days": 10,
+  "initial_ar": 200000.0,
+  "initial_ap": 100000.0,
+  "credit_facility": 1000000.0,
+  "debt_covenant_min_cash": 500000.0,
+  "contracts": [
+    {
+      "contract_id": "PROBE-VENDOR-COV",
+      "contract_type": "Vendor Agreement",
+      "parties": ["ProbeTest Corp Gamma", "Vendor Corp"],
+      "jurisdiction": "Delaware",
+      "effective_date": "2024-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-VENDOR-PENALTY",
+          "clause_type": "penalty",
+          "text": "Failure to meet delivery schedule incurs a penalty of $350,000 payable within 5 days.",
+          "penalty_amount": 350000.0,
+          "deadline_days": 5,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "PROBE-LOAN-COV",
+      "contract_type": "Credit Facility",
+      "parties": ["ProbeTest Corp Gamma", "BankCorp"],
+      "jurisdiction": "New York",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "PROBE-LOAN-COVEN",
+          "clause_type": "financial_covenant",
+          "text": "Borrower must maintain minimum cash of $500,000. Breach is an Event of Default. Bank may immediately freeze the credit facility.",
+          "penalty_amount": 0.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        },
+        {
+          "clause_id": "PROBE-LOAN-WAIVER",
+          "clause_type": "waiver",
+          "text": "Waiver of covenant breach may be requested in writing at least 48 hours before the anticipated breach.",
+          "penalty_amount": 0.0,
+          "deadline_days": 3,
+          "is_invokable": true,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "PROBE-VENDOR-COV",
+      "source_clause_id": "PROBE-VENDOR-PENALTY",
+      "target_contract": "PROBE-LOAN-COV",
+      "target_clause_id": "PROBE-LOAN-COVEN",
+      "edge_type": "cascade_trigger",
+      "description": "Paying the $350K penalty drops cash from $900K to $550K — ABOVE the $500K covenant. BUT: agent must project that any additional cost will breach it. Agent should draw credit facility or request waiver before paying.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "PROBE-CP-004",
+      "name": "BankCorp",
+      "role": "primary_lender",
+      "profile": "aggressive",
+      "relationship_health": 1.0,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [
+    {
+      "deadline_id": "PROBE-DL-002",
+      "description": "Request covenant waiver BEFORE cash drops below $500K",
+      "contract_id": "PROBE-LOAN-COV",
+      "clause_id": "PROBE-LOAN-WAIVER",
+      "due_day": 3,
+      "penalty_if_missed": 0.0,
+      "status": "active",
+      "consequence_description": "Without waiver, BankCorp can freeze credit facility the moment cash breaches $500K."
+    }
+  ],
+  "shock_events": [
+    {
+      "shock_id": "PROBE-SHOCK-003",
+      "category": "financial",
+      "title": "Delivery Failure — $350K Penalty Due in 5 Days",
+      "description": "A delivery failure has triggered a $350K penalty payable to Vendor Corp within 5 days. Current cash: $900K. After paying: $550K. CRITICAL: This leaves only $50K buffer above the $500K debt covenant. Any further cost will trigger a bank default. Agent must request covenant waiver from BankCorp BEFORE paying the penalty.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": 0.0,
+      "triggered_obligations": ["PROBE-VENDOR-PENALTY"]
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "PROBE-MSG-003",
+      "day_received": 1,
+      "sender": "Vendor Corp Finance",
+      "subject": "Penalty Invoice — $350,000 — Due Day 5",
+      "body": "Per Section 7 of our agreement, a delivery failure penalty of $350,000 is now due and payable within 5 business days. Please confirm payment timeline.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 5,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "waiver_requested_before_payment",
+  "probe_fail_condition": "payment_made_without_waiver_causing_covenant_breach"
+}

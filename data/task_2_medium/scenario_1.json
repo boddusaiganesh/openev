@@ -1,0 +1,64 @@
+{
+  "contract_meta": {
+    "contract_type": "Master Services Agreement",
+    "parties": ["Tech Solutions LLC", "Global Industries Inc"],
+    "jurisdiction": "State of New York",
+    "effective_date": "2024-03-01"
+  },
+  "clauses": [
+    {
+      "text": "The Service Provider shall indemnify, defend, and hold harmless the Client from and against any and all claims, damages, losses, and expenses arising from the Service Provider's negligence or willful misconduct in performance of the services.",
+      "clause_type": "indemnification",
+      "risk_level": "medium",
+      "issues": ["one_sided_obligation", "overly_broad_scope"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["indemnify", "defend", "hold harmless", "negligence"],
+      "difficulty_note": "Indemnification is broad and may expose client to uncapped liability"
+    },
+    {
+      "text": "In no event shall either party's aggregate liability under this Agreement exceed the total fees paid or payable by Client to Service Provider during the twelve months preceding the claim.",
+      "clause_type": "limitation_of_liability",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["limitation of liability", "aggregate liability", "twelve months"],
+      "difficulty_note": "Reasonable cap tied to fees paid"
+    },
+    {
+      "text": "Client shall maintain comprehensive general liability insurance with coverage of at least $2,000,000 per occurrence and shall name Service Provider as additional insured.",
+      "clause_type": "insurance",
+      "risk_level": "medium",
+      "issues": ["missing_carve_out"],
+      "recommended_action": "flag_for_negotiation",
+      "reasoning_keywords": ["insurance", "additional insured", "$2,000,000"],
+      "difficulty_note": "May need carve-out for gross negligence"
+    },
+    {
+      "text": "Each party represents and warrants that it has full power and authority to enter into this Agreement and that the execution and performance of this Agreement does not conflict with any agreement to which it is a party.",
+      "clause_type": "representations",
+      "risk_level": "medium",
+      "issues": ["vague_language"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["represents and warrants", "full power and authority", "does not conflict"],
+      "difficulty_note": "Representations are vague and may need specificity"
+    },
+    {
+      "text": "Service Provider shall not be liable for any failure or delay in performing its obligations where such failure or delay results from Force Majeure Events including but not limited to acts of God, natural disasters, war, terrorism, or government actions.",
+      "clause_type": "force_majeure",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["force majeure", "failure or delay", "acts of God"],
+      "difficulty_note": "Standard force majeure provision"
+    },
+    {
+      "text": "The term of this Agreement shall be three years from the Effective Date and shall automatically renew for successive one-year periods unless either party provides written notice of non-renewal at least sixty days prior to the end of the then-current term.",
+      "clause_type": "termination",
+      "risk_level": "high",
+      "issues": ["automatic_renewal", "missing_time_limit"],
+      "recommended_action": "request_modification",
+      "reasoning_keywords": ["three years", "automatically renew", "sixty days"],
+      "difficulty_note": "Auto-renewal could lock parties in; should negotiate cap on renewals"
+    }
+  ]
+}

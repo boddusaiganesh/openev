@@ -1,0 +1,55 @@
+{
+  "contract_meta": {
+    "contract_type": "Employment Agreement",
+    "parties": ["GlobalTech Inc", "John Smith"],
+    "jurisdiction": "State of Washington",
+    "effective_date": "2024-04-15"
+  },
+  "clauses": [
+    {
+      "text": "Employee acknowledges that during employment, Employee will have access to and become acquainted with trade secrets and confidential information belonging to Employer.",
+      "clause_type": "confidentiality",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["trade secrets", "confidential information", "access"],
+      "difficulty_note": "Standard confidentiality acknowledgment"
+    },
+    {
+      "text": "Employee agrees that for a period of twelve months following termination of employment, Employee will not directly or indirectly engage in any business competitive with the Employer.",
+      "clause_type": "non_compete",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["non-compete", "twelve months", "competitive"],
+      "difficulty_note": "Standard non-compete clause"
+    },
+    {
+      "text": "This Agreement shall be governed by and construed in accordance with the laws of the State of Washington.",
+      "clause_type": "governing_law",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["governed by", "laws of Washington", "construed"],
+      "difficulty_note": "Standard governing law clause"
+    },
+    {
+      "text": "Either party may terminate this Agreement at any time, with or without cause, upon fourteen days written notice to the other party.",
+      "clause_type": "termination",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["terminate", "fourteen days", "with or without cause"],
+      "difficulty_note": "At-will employment termination"
+    },
+    {
+      "text": "Employee agrees that any inventions, discoveries, or improvements made by Employee during employment relating to Employer's business shall be the sole property of Employer.",
+      "clause_type": "intellectual_property",
+      "risk_level": "low",
+      "issues": [],
+      "recommended_action": "accept_as_is",
+      "reasoning_keywords": ["inventions", "improvements", "sole property"],
+      "difficulty_note": "Standard IP assignment clause"
+    }
+  ]
+}

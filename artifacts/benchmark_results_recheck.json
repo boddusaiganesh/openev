@@ -1,0 +1,922 @@
+{
+  "benchmark_results": [
+    {
+      "strategy": "optimal",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.5,
+      "breakdown": {
+        "type_accuracy": 0.5
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 10,
+      "clauses_reviewed": 0,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.5,
+      "breakdown": {
+        "type_accuracy": 0.5
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 10,
+      "clauses_reviewed": 0,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.5,
+      "breakdown": {
+        "type_accuracy": 0.5
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 1.0,
+      "breakdown": {
+        "type_accuracy": 1.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 8,
+      "max_steps": 10,
+      "clauses_reviewed": 4,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 10,
+      "clauses_reviewed": 0,
+      "total_clauses": 4,
+      "task_id": "task_1_easy",
+      "difficulty": "easy",
+      "scenario_file": "task_1_easy/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.8333,
+      "breakdown": {
+        "type_accuracy": 0.8333,
+        "risk_accuracy": 0.8333,
+        "flag_accuracy": 0.8333,
+        "weighted_before_penalties": 0.8333
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.6167,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.6667,
+        "weighted_before_penalties": 0.6167
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.3,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.3
+      },
+      "penalties": {},
+      "steps_used": 12,
+      "max_steps": 20,
+      "clauses_reviewed": 6,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 0.25,
+        "risk_accuracy": 0.25,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 20,
+      "clauses_reviewed": 0,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.8333,
+      "breakdown": {
+        "type_accuracy": 0.8333,
+        "risk_accuracy": 0.8333,
+        "flag_accuracy": 0.8333,
+        "weighted_before_penalties": 0.8333
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.6167,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.6667,
+        "weighted_before_penalties": 0.6167
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.3,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.3
+      },
+      "penalties": {},
+      "steps_used": 12,
+      "max_steps": 20,
+      "clauses_reviewed": 6,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 0.25,
+        "risk_accuracy": 0.25,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 20,
+      "clauses_reviewed": 0,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.8333,
+      "breakdown": {
+        "type_accuracy": 0.8333,
+        "risk_accuracy": 0.8333,
+        "flag_accuracy": 0.8333,
+        "weighted_before_penalties": 0.8333
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.6167,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.6667,
+        "weighted_before_penalties": 0.6167
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.3,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.3
+      },
+      "penalties": {},
+      "steps_used": 12,
+      "max_steps": 20,
+      "clauses_reviewed": 6,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 0.25,
+        "risk_accuracy": 0.25,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 20,
+      "max_steps": 20,
+      "clauses_reviewed": 5,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 20,
+      "clauses_reviewed": 0,
+      "total_clauses": 6,
+      "task_id": "task_2_medium",
+      "difficulty": "medium",
+      "scenario_file": "task_2_medium/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.5125,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.5833,
+        "suggest_accuracy": 0.5833,
+        "reasoning_quality": 0.5,
+        "weighted_before_penalties": 0.5125
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0103
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.3583,
+      "breakdown": {
+        "type_accuracy": 0.4167,
+        "risk_accuracy": 0.4583,
+        "flag_accuracy": 0.3333,
+        "suggest_accuracy": 0.5,
+        "reasoning_quality": 0.25,
+        "weighted_before_penalties": 0.3583
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 24,
+      "max_steps": 40,
+      "clauses_reviewed": 12,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0965,
+      "breakdown": {
+        "type_accuracy": 0.125,
+        "risk_accuracy": 0.1667,
+        "flag_accuracy": 0.0556,
+        "suggest_accuracy": 0.1667,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0965
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 40,
+      "clauses_reviewed": 0,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_1.json",
+      "scenario_index": 0,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.5125,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.5833,
+        "suggest_accuracy": 0.5833,
+        "reasoning_quality": 0.5,
+        "weighted_before_penalties": 0.5125
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.3583,
+      "breakdown": {
+        "type_accuracy": 0.4167,
+        "risk_accuracy": 0.4583,
+        "flag_accuracy": 0.3333,
+        "suggest_accuracy": 0.5,
+        "reasoning_quality": 0.25,
+        "weighted_before_penalties": 0.3583
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 24,
+      "max_steps": 40,
+      "clauses_reviewed": 12,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0965,
+      "breakdown": {
+        "type_accuracy": 0.125,
+        "risk_accuracy": 0.1667,
+        "flag_accuracy": 0.0556,
+        "suggest_accuracy": 0.1667,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0965
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.002
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 40,
+      "clauses_reviewed": 0,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_2.json",
+      "scenario_index": 1,
+      "elapsed_seconds": 0.0
+    },
+    {
+      "strategy": "optimal",
+      "grader_score": 0.5125,
+      "breakdown": {
+        "type_accuracy": 0.5833,
+        "risk_accuracy": 0.5833,
+        "flag_accuracy": 0.5833,
+        "suggest_accuracy": 0.5833,
+        "reasoning_quality": 0.5,
+        "weighted_before_penalties": 0.5125
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "partial_correct",
+      "grader_score": 0.3583,
+      "breakdown": {
+        "type_accuracy": 0.4167,
+        "risk_accuracy": 0.4583,
+        "flag_accuracy": 0.3333,
+        "suggest_accuracy": 0.5,
+        "reasoning_quality": 0.25,
+        "weighted_before_penalties": 0.3583
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.002
+    },
+    {
+      "strategy": "classify_only",
+      "grader_score": 0.15,
+      "breakdown": {
+        "type_accuracy": 1.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.15
+      },
+      "penalties": {},
+      "steps_used": 24,
+      "max_steps": 40,
+      "clauses_reviewed": 12,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "all_wrong",
+      "grader_score": 0.0965,
+      "breakdown": {
+        "type_accuracy": 0.125,
+        "risk_accuracy": 0.1667,
+        "flag_accuracy": 0.0556,
+        "suggest_accuracy": 0.1667,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0965
+      },
+      "penalties": {},
+      "steps_used": 40,
+      "max_steps": 40,
+      "clauses_reviewed": 7,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "strategy": "empty",
+      "grader_score": 0.0,
+      "breakdown": {
+        "type_accuracy": 0.0,
+        "risk_accuracy": 0.0,
+        "flag_accuracy": 0.0,
+        "suggest_accuracy": 0.0,
+        "reasoning_quality": 0.0,
+        "weighted_before_penalties": 0.0
+      },
+      "penalties": {},
+      "steps_used": 1,
+      "max_steps": 40,
+      "clauses_reviewed": 0,
+      "total_clauses": 12,
+      "task_id": "task_3_hard",
+      "difficulty": "hard",
+      "scenario_file": "task_3_hard/scenario_3.json",
+      "scenario_index": 2,
+      "elapsed_seconds": 0.001
+    }
+  ],
+  "total_runtime_seconds": 0.07,
+  "summary": {
+    "optimal": {
+      "avg": 0.7819,
+      "min": 0.5125,
+      "max": 1.0,
+      "count": 9
+    },
+    "partial_correct": {
+      "avg": 0.4917,
+      "min": 0.3583,
+      "max": 0.6167,
+      "count": 9
+    },
+    "classify_only": {
+      "avg": 0.4833,
+      "min": 0.15,
+      "max": 1.0,
+      "count": 9
+    },
+    "all_wrong": {
+      "avg": 0.0822,
+      "min": 0.0,
+      "max": 0.15,
+      "count": 9
+    },
+    "empty": {
+      "avg": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "count": 9
+    }
+  }
+}

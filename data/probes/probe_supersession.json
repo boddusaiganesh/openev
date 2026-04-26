@@ -1,0 +1,104 @@
+{
+  "probe_id": "probe_supersession",
+  "failure_mode": "supersession",
+  "description": "An addendum signed 6 months after the original contract supersedes the original penalty clause, reducing liability from  to . Agent must discover the addendum clause.",
+  "company_name": "ProbeTest Corp Theta",
+  "industry": "Technology",
+  "initial_cash": 1800000.0,
+  "survival_target_days": 10,
+  "initial_ar": 300000.0,
+  "initial_ap": 100000.0,
+  "credit_facility": 500000.0,
+  "debt_covenant_min_cash": 600000.0,
+  "contracts": [
+    {
+      "contract_id": "SUPER-ORIG",
+      "contract_type": "Software Development Agreement",
+      "parties": [
+        "ProbeTest Corp Theta",
+        "ClientDelta"
+      ],
+      "jurisdiction": "CA",
+      "effective_date": "2023-01-01",
+      "clauses": [
+        {
+          "clause_id": "SUPER-ORIG-PEN",
+          "clause_type": "liquidated_damages",
+          "text": "Failure to deliver by the milestone date incurs liquidated damages of ,000.",
+          "penalty_amount": 500000.0,
+          "deadline_days": 7,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    },
+    {
+      "contract_id": "SUPER-ADDENDUM",
+      "contract_type": "Addendum to Software Development Agreement",
+      "parties": [
+        "ProbeTest Corp Theta",
+        "ClientDelta"
+      ],
+      "jurisdiction": "CA",
+      "effective_date": "2023-07-01",
+      "clauses": [
+        {
+          "clause_id": "SUPER-ADD-CLAUSE",
+          "clause_type": "supersession",
+          "text": "This Addendum, dated July 1 2023, supersedes and replaces Section 12 (Liquidated Damages) of the original Software Development Agreement in its entirety. The parties agree that the liquidated damages for milestone failure shall be ,000, not ,000 as previously stated.",
+          "penalty_amount": 50000.0,
+          "deadline_days": null,
+          "is_invokable": false,
+          "invoked": false
+        }
+      ]
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_contract": "SUPER-ADDENDUM",
+      "source_clause_id": "SUPER-ADD-CLAUSE",
+      "target_contract": "SUPER-ORIG",
+      "target_clause_id": "SUPER-ORIG-PEN",
+      "edge_type": "supersession",
+      "description": "The Addendum reduces the penalty from  to . Agent must discover and apply the supersession.",
+      "discovered": false
+    }
+  ],
+  "counterparties": [
+    {
+      "counterparty_id": "SUPER-CP-001",
+      "name": "ClientDelta",
+      "role": "client",
+      "profile": "aggressive",
+      "relationship_health": 0.5,
+      "risk_profile_revealed": false
+    }
+  ],
+  "deadlines": [],
+  "shock_events": [
+    {
+      "shock_id": "SUPER-SHOCK",
+      "category": "financial",
+      "title": "Milestone Miss \u2014 ClientDelta Demanding ",
+      "description": "ClientDelta is demanding ,000 in liquidated damages for a missed milestone. HIDDEN: An addendum signed in July 2023 supersedes the original LD clause and reduces liability to ,000. Agent must cross-reference both contracts to discover the supersession and dispute the inflated demand.",
+      "occurs_on_day": 1,
+      "immediate_cash_impact": 0.0,
+      "triggered_obligations": []
+    }
+  ],
+  "initial_inbox": [
+    {
+      "message_id": "SUPER-MSG",
+      "day_received": 1,
+      "sender": "ClientDelta Legal",
+      "subject": "Liquidated Damages Demand \u2014 ,000",
+      "body": "Pursuant to Section 12 of our Software Development Agreement, we hereby demand payment of ,000 in liquidated damages for the milestone failure on December 1 2024. Please confirm payment within 7 days.",
+      "is_legal_notice": true,
+      "requires_response_by_day": 5,
+      "read": false
+    }
+  ],
+  "probe_pass_condition": "dispute_citing_addendum_supersession_50k_not_500k",
+  "probe_fail_condition": "payment_of_500k_without_checking_addendum"
+}

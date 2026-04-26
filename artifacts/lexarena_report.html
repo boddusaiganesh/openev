@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexArena Benchmark Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #030712;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      padding: 60px 40px 50px;
+      text-align: center;
+      border-bottom: 1px solid #1e293b;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, #6366f133 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      color: #fff;
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #e2e8f0 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      color: #94a3b8;
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto 8px;
+    }
+    .hero .timestamp { color: #475569; font-size: 13px; margin-top: 16px; }
+
+    /* Layout */
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #f1f5f9;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #334155, transparent);
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .summary-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .summary-card:hover { border-color: #6366f1; }
+    .summary-card .value {
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .summary-card .label { color: #64748b; font-size: 13px; }
+
+    /* Table */
+    .table-wrap {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      overflow-x: auto;
+      margin-bottom: 40px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #0a0f1e;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #1e293b;
+    }
+    .table-row { border-bottom: 1px solid #1e293b; transition: background 0.15s; }
+    .table-row:hover { background: #1e293b44; }
+    .table-row td { padding: 16px; vertical-align: middle; }
+    .table-row:last-child { border-bottom: none; }
+
+    /* Tier cards grid */
+    .tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .tier-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .tier-card:hover { border-color: #6366f155; transform: translateY(-2px); }
+
+    /* Chart */
+    .chart-wrap {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Scoring formula */
+    .formula-box {
+      background: #0a0f1e;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 2;
+      color: #94a3b8;
+    }
+    .formula-box .accent { color: #818cf8; font-weight: 700; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: #334155;
+      font-size: 12px;
+      border-top: 1px solid #1e293b;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Benchmark Report</div>
+  <h1>LexArena</h1>
+  <p>The Complete Legal Intelligence Benchmark</p>
+  <p style="color:#6366f1;font-size:14px;">READ &rarr; CLASSIFY &rarr; CONNECT &rarr; DECIDE &rarr; SURVIVE</p>
+  <div class="timestamp">Generated: 2026-04-25 17:10:35</div>
+</div>
+
+<div class="container">
+
+  <!-- Summary Cards -->
+  <div class="section-title">Overview</div>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="value" style="color:#6366f1;">4</div>
+      <div class="label">Strategies Evaluated</div>
+    </div>
+    <div class="summary-card">
+      <div class="value" style="color:#22c55e;">0.5813</div>
+      <div class="label">Best Legal IQ</div>
+    </div>
+    <div class="summary-card">
+      <div class="value" style="color:#f59e0b;">6</div>
+      <div class="label">Evaluation Tiers</div>
+    </div>
+    <div class="summary-card">
+      <div class="value" style="color:#ef4444;">10</div>
+      <div class="label">Adversarial Probes</div>
+    </div>
+    <div class="summary-card">
+      <div class="value" style="color:#a855f7;">15</div>
+      <div class="label">Scenario Files</div>
+    </div>
+    <div class="summary-card">
+      <div class="value" style="color:#0ea5e9;">0</div>
+      <div class="label">LLM Judges Used</div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Table -->
+  <div class="section-title">Leaderboard</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">Rank</th>
+          <th>Strategy / Model</th>
+          <th>Label</th>
+          <th style="text-align:center;">Legal IQ</th>
+          <th>T1 Reading</th>
+          <th>T2 Classify</th>
+          <th>T3 Dep.</th>
+          <th>T4 Easy</th>
+          <th>T5 Med.</th>
+          <th>T6 Hard</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="table-row" data-rank="1">
+          <td style="text-align:center;font-size:20px;">🥇</td>
+          <td><span style="font-weight:600;color:#f1f5f9;">full_context_deadline</span></td>
+          <td>
+            <span style="background:#0891b222;color:#0891b2;padding:3px 10px;
+              border-radius:20px;font-size:12px;font-weight:600;">Junior Associate Level</span>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:22px;font-weight:800;color:#f59e0b;">0.5813</span>
+          </td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f59e0b;width:73%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f59e0b;font-size:12px;margin-left:6px;">0.736</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f97316;width:40%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f97316;font-size:12px;margin-left:6px;">0.400</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.100</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:86%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.863</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:75%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.757</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:75%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.753</span></td>
+        </tr>
+        <tr class="table-row" data-rank="2">
+          <td style="text-align:center;font-size:20px;">🥈</td>
+          <td><span style="font-weight:600;color:#f1f5f9;">best_available</span></td>
+          <td>
+            <span style="background:#d9770622;color:#d97706;padding:3px 10px;
+              border-radius:20px;font-size:12px;font-weight:600;">Paralegal Level</span>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:22px;font-weight:800;color:#f97316;">0.4933</span>
+          </td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:15%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.150</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f97316;width:40%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f97316;font-size:12px;margin-left:6px;">0.400</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.100</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:86%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.863</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:75%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.757</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#22c55e;width:75%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#22c55e;font-size:12px;margin-left:6px;">0.753</span></td>
+        </tr>
+        <tr class="table-row" data-rank="3">
+          <td style="text-align:center;font-size:20px;">🥉</td>
+          <td><span style="font-weight:600;color:#f1f5f9;">first_sentence_passive</span></td>
+          <td>
+            <span style="background:#d9770622;color:#d97706;padding:3px 10px;
+              border-radius:20px;font-size:12px;font-weight:600;">Paralegal Level</span>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:22px;font-weight:800;color:#f97316;">0.3021</span>
+          </td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:15%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.150</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f97316;width:40%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f97316;font-size:12px;margin-left:6px;">0.400</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.100</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f59e0b;width:69%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f59e0b;font-size:12px;margin-left:6px;">0.697</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f59e0b;width:52%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f59e0b;font-size:12px;margin-left:6px;">0.523</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.104</span></td>
+        </tr>
+        <tr class="table-row" data-rank="4">
+          <td style="text-align:center;font-size:20px;">#4</td>
+          <td><span style="font-weight:600;color:#f1f5f9;">passive_baseline</span></td>
+          <td>
+            <span style="background:#dc262622;color:#dc2626;padding:3px 10px;
+              border-radius:20px;font-size:12px;font-weight:600;">Fails Legal Practice Bar</span>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:22px;font-weight:800;color:#ef4444;">0.2811</span>
+          </td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:1%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.010</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f97316;width:40%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f97316;font-size:12px;margin-left:6px;">0.400</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.100</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f59e0b;width:69%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f59e0b;font-size:12px;margin-left:6px;">0.697</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#f59e0b;width:52%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#f59e0b;font-size:12px;margin-left:6px;">0.523</span></td>
+          <td><div style="background:#1e293b;border-radius:4px;width:180px;height:10px;overflow:hidden;"><div style="background:#ef4444;width:10%;height:100%;border-radius:4px;transition:width 1s ease;"></div></div><span style="color:#ef4444;font-size:12px;margin-left:6px;">0.104</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Radar Chart -->
+  <div class="section-title">Cognitive Dimension Profile</div>
+  <div class="chart-wrap">
+    <canvas id="radarChart" width="500" height="500"></canvas>
+  </div>
+
+  <!-- Tier Cards -->
+  <div class="section-title">Tier Architecture</div>
+  <div class="tiers-grid">
+    
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#6366f1;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T1</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Clause Reading</span>
+            <span style="margin-left:auto;background:#6366f122;color:#6366f1;
+              border-radius:12px;padding:2px 10px;font-size:12px;">15%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent extract the exact sentence answering a legal question?<br><b>Metric:</b> F2 score (recall-weighted) + Jaccard + Laziness Rate.<br><b>Data:</b> CUAD dataset — 510 real contracts, 41 question types.</p>
+        </div>
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#22c55e;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T2</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Risk Classification</span>
+            <span style="margin-left:auto;background:#22c55e22;color:#22c55e;
+              border-radius:12px;padding:2px 10px;font-size:12px;">15%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent classify clause type, risk level, and recommend an action?<br><b>Metric:</b> Weighted label accuracy across 3 difficulty tasks.<br><b>Data:</b> OpenEnv tasks 1-3.</p>
+        </div>
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#f59e0b;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T3</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Dependency Mapping</span>
+            <span style="margin-left:auto;background:#f59e0b22;color:#f59e0b;
+              border-radius:12px;padding:2px 10px;font-size:12px;">20%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent proactively map all hidden cross-contract dependency edges?<br><b>Metric:</b> Precision/recall/F1 against ground-truth edge list.<br><b>Data:</b> LexDomino scenario dependency_edges arrays.</p>
+        </div>
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#f97316;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T4</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Crisis Easy</span>
+            <span style="margin-left:auto;background:#f9731622;color:#f97316;
+              border-radius:12px;padding:2px 10px;font-size:12px;">12.5%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent manage a single-contract crisis over 15 days?<br><b>Metric:</b> Cash survival ratio + deadlines met + edges discovered.</p>
+        </div>
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#ef4444;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T5</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Crisis Medium</span>
+            <span style="margin-left:auto;background:#ef444422;color:#ef4444;
+              border-radius:12px;padding:2px 10px;font-size:12px;">17.5%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent handle a multi-contract crisis with hidden dependencies?<br><b>Metric:</b> Cash survival ratio — adversarial counterparties.</p>
+        </div>
+        <div class="tier-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="background:#dc2626;color:#fff;border-radius:8px;
+              padding:4px 12px;font-weight:800;font-size:14px;">T6</div>
+            <span style="font-size:16px;font-weight:700;color:#f1f5f9;">Crisis Hard</span>
+            <span style="margin-left:auto;background:#dc262622;color:#dc2626;
+              border-radius:12px;padding:2px 10px;font-size:12px;">20%</span>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">Can the agent survive 30-day full systemic cascade with compound shocks?<br><b>Metric:</b> Cash survival — bankruptcy = 0 score.</p>
+        </div>
+  </div>
+
+  <!-- Scoring Formula -->
+  <div class="section-title">Legal IQ Scoring Formula</div>
+  <div class="formula-box">
+    <span class="accent">Legal_IQ</span> = <span style="color:#22c55e;">0.15</span> × T1_Reading_Score<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span style="color:#22c55e;">0.15</span> × T2_Classification_Score<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span style="color:#f59e0b;">0.20</span> × T3_Dependency_Score<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span style="color:#ef4444;">0.50</span> × T4_T5_T6_Crisis_Score<br><br>
+    where <span class="accent">T4_T5_T6_Crisis_Score</span> = (0.25×T4 + 0.35×T5 + 0.40×T6)<br><br>
+    <span class="accent">T1_score</span> = 0.60×F2 + 0.25×Jaccard_mean + 0.15×(1 − laziness_rate)<br>
+    <span class="accent">T3_score</span> = 0.50×recall + 0.25×precision + 0.15×edge_type_accuracy + 0.10×severity_order
+  </div>
+
+</div>
+
+<footer>
+  LexArena v1.0 &bull; Pure deterministic scoring &bull; No LLM judges &bull;
+  Built on OpenEnv + LexDomino + ContractEval/CUAD
+</footer>
+
+<script>
+const ctx = document.getElementById('radarChart').getContext('2d');
+new Chart(ctx, {
+  type: 'radar',
+  data: {
+    labels: ["Clause Reading", "Risk Classification", "Dep. Mapping", "Crisis Easy", "Crisis Hard"],
+    datasets: [{"label": "full_context_deadline", "data": [73.6, 40.0, 10.0, 86.2, 75.3], "borderColor": "#6366f1", "backgroundColor": "#6366f122", "pointBackgroundColor": "#6366f1"}, {"label": "best_available", "data": [15.0, 40.0, 10.0, 86.2, 75.3], "borderColor": "#22c55e", "backgroundColor": "#22c55e22", "pointBackgroundColor": "#22c55e"}, {"label": "first_sentence_passive", "data": [15.0, 40.0, 10.0, 69.7, 10.4], "borderColor": "#f59e0b", "backgroundColor": "#f59e0b22", "pointBackgroundColor": "#f59e0b"}, {"label": "passive_baseline", "data": [1.0, 40.0, 10.0, 69.7, 10.4], "borderColor": "#ef4444", "backgroundColor": "#ef444422", "pointBackgroundColor": "#ef4444"}]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        labels: { color: '#94a3b8', font: { size: 12 } }
+      }
+    },
+    scales: {
+      r: {
+        min: 0, max: 100,
+        grid: { color: '#1e293b' },
+        angleLines: { color: '#1e293b' },
+        pointLabels: { color: '#94a3b8', font: { size: 12 } },
+        ticks: { color: '#475569', backdropColor: 'transparent', stepSize: 25 }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
