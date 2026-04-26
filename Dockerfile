@@ -20,6 +20,7 @@ COPY --chown=user:user . .
 
 EXPOSE 7860
 
+# Health check hits the /health endpoint
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:7860/health || exit 1
 

@@ -1,34 +1,57 @@
 """
-LexArena — Composite Scorer
-Computes the Legal IQ score from all 6 tier results.
-Pure math — fully deterministic.
+LexArena — Legal IQ Composite Scorer
+======================================
+Aggregates per-tier scores into the composite Legal IQ score.
+
+Formula:
+    Legal_IQ = 0.15 * T1  +  0.15 * T2  +  0.20 * T3
+              + 0.50 * (0.25 * T4 + 0.35 * T5 + 0.40 * T6)
+
+Labels:
+    0.85–1.00  Expert CRO Level
+    0.70–0.84  Senior Lawyer Level
+    0.50–0.69  Junior Associate Level
+    0.30–0.49  Paralegal Level
+    0.00–0.29  Fails Legal Practice Bar
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional
 
-from lexarena_models import (
-    LegalIQScore, TierScore, TierName, ProbeResult, ProbeOutcome
-)
+from models import LegalIQScore
 
 
 # ---------------------------------------------------------------------------
-# Weights (from LexArena plan)
+# Weight constants (matches openenv.yaml)
 # ---------------------------------------------------------------------------
 
 TIER_WEIGHTS = {
-    TierName.TIER1_READING:        0.15,
-    TierName.TIER2_CLASSIFICATION: 0.15,
-    TierName.TIER3_DEPENDENCY:     0.20,
-}
-# Tiers 4-6 combined weight = 0.50
-CRISIS_WEIGHT = 0.50
-CRISIS_SUB_WEIGHTS = {
-    TierName.TIER4_CASCADE_EASY:   0.25,
-    TierName.TIER5_CASCADE_MEDIUM: 0.35,
-    TierName.TIER6_CASCADE_HARD:   0.40,
+    "t1": 0.15,
+    "t2": 0.15,
+    "t3": 0.20,
 }
 
+CRISIS_WEIGHTS = {
+    "t4": 0.25,
+    "t5": 0.35,
+    "t6": 0.40,
+}
+
+CRISIS_SHARE = 0.50   # crisis management gets 50% of Legal IQ
+
+LABELS = [
+    (0.85, 1.01, "Expert CRO Level"),
+    (0.70, 0.85, "Senior Lawyer Level"),
+    (0.50, 0.70, "Junior Associate Level"),
+    (0.30, 0.50, "Paralegal Level"),
+    (0.00, 0.30, "Fails Legal Practice Bar"),
+]
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
 def compute_legal_iq(
     t1_score: float = 0.0,
@@ -37,137 +60,113 @@ def compute_legal_iq(
     t4_score: float = 0.0,
     t5_score: float = 0.0,
     t6_score: float = 0.0,
-    probe_results: Optional[List[ProbeResult]] = None,
+    model_name: str = "",
 ) -> LegalIQScore:
     """
-    Compute the composite Legal IQ score.
+    Compute the composite Legal IQ score from per-tier scores.
 
-    All tier scores are in [0, 1].
-    Missing tiers default to 0.0 but their weight is still applied —
-    this penalises agents that skip tiers.
+    All inputs are expected in [0.0, 1.0]. Missing tiers should be 0.0.
+    Returns a LegalIQScore with breakdown and label.
     """
-    probe_results = probe_results or []
+    # Clamp inputs
+    def c(x: float) -> float:
+        return max(0.0, min(1.0, float(x)))
 
-    # Individual tier contributions
-    t1_contrib = t1_score * TIER_WEIGHTS[TierName.TIER1_READING]
-    t2_contrib = t2_score * TIER_WEIGHTS[TierName.TIER2_CLASSIFICATION]
-    t3_contrib = t3_score * TIER_WEIGHTS[TierName.TIER3_DEPENDENCY]
+    t1, t2, t3 = c(t1_score), c(t2_score), c(t3_score)
+    t4, t5, t6 = c(t4_score), c(t5_score), c(t6_score)
 
-    # Crisis sub-scores
-    t4_contrib = t4_score * CRISIS_SUB_WEIGHTS[TierName.TIER4_CASCADE_EASY]
-    t5_contrib = t5_score * CRISIS_SUB_WEIGHTS[TierName.TIER5_CASCADE_MEDIUM]
-    t6_contrib = t6_score * CRISIS_SUB_WEIGHTS[TierName.TIER6_CASCADE_HARD]
-    crisis_combined = t4_contrib + t5_contrib + t6_contrib  # [0, 1] within crisis block
+    # Crisis sub-score (weighted average of Tiers 4-6)
+    crisis = (
+        CRISIS_WEIGHTS["t4"] * t4
+        + CRISIS_WEIGHTS["t5"] * t5
+        + CRISIS_WEIGHTS["t6"] * t6
+    )
 
-    # Apply crisis block weight
-    crisis_contrib = crisis_combined * CRISIS_WEIGHT
-
-    # Total Legal IQ
-    legal_iq = round(t1_contrib + t2_contrib + t3_contrib + crisis_contrib, 4)
+    # Full composite
+    legal_iq = (
+        TIER_WEIGHTS["t1"] * t1
+        + TIER_WEIGHTS["t2"] * t2
+        + TIER_WEIGHTS["t3"] * t3
+        + CRISIS_SHARE * crisis
+    )
     legal_iq = max(0.0, min(1.0, legal_iq))
 
-    # Build tier score list
-    tier_scores = [
-        TierScore(
-            tier=TierName.TIER1_READING,
-            raw_score=round(t1_score, 4),
-            weight=TIER_WEIGHTS[TierName.TIER1_READING],
-            weighted_contribution=round(t1_contrib, 4),
-        ),
-        TierScore(
-            tier=TierName.TIER2_CLASSIFICATION,
-            raw_score=round(t2_score, 4),
-            weight=TIER_WEIGHTS[TierName.TIER2_CLASSIFICATION],
-            weighted_contribution=round(t2_contrib, 4),
-        ),
-        TierScore(
-            tier=TierName.TIER3_DEPENDENCY,
-            raw_score=round(t3_score, 4),
-            weight=TIER_WEIGHTS[TierName.TIER3_DEPENDENCY],
-            weighted_contribution=round(t3_contrib, 4),
-        ),
-        TierScore(
-            tier=TierName.TIER4_CASCADE_EASY,
-            raw_score=round(t4_score, 4),
-            weight=CRISIS_SUB_WEIGHTS[TierName.TIER4_CASCADE_EASY] * CRISIS_WEIGHT,
-            weighted_contribution=round(t4_contrib * CRISIS_WEIGHT, 4),
-        ),
-        TierScore(
-            tier=TierName.TIER5_CASCADE_MEDIUM,
-            raw_score=round(t5_score, 4),
-            weight=CRISIS_SUB_WEIGHTS[TierName.TIER5_CASCADE_MEDIUM] * CRISIS_WEIGHT,
-            weighted_contribution=round(t5_contrib * CRISIS_WEIGHT, 4),
-        ),
-        TierScore(
-            tier=TierName.TIER6_CASCADE_HARD,
-            raw_score=round(t6_score, 4),
-            weight=CRISIS_SUB_WEIGHTS[TierName.TIER6_CASCADE_HARD] * CRISIS_WEIGHT,
-            weighted_contribution=round(t6_contrib * CRISIS_WEIGHT, 4),
-        ),
-    ]
-
-    # Probe summary
-    passed = sum(1 for p in probe_results if p.outcome == ProbeOutcome.PASSED)
-    failed = sum(1 for p in probe_results if p.outcome == ProbeOutcome.FAILED)
-    triggered = [p.failure_mode.value for p in probe_results if p.outcome == ProbeOutcome.FAILED]
+    label = _get_label(legal_iq)
 
     return LegalIQScore(
-        tier_scores=tier_scores,
-        probe_results=probe_results,
-        legal_iq=legal_iq,
-        t1_reading=round(t1_score, 4),
-        t2_classification=round(t2_score, 4),
-        t3_dependency=round(t3_score, 4),
-        t4_crisis_easy=round(t4_score, 4),
-        t5_crisis_medium=round(t5_score, 4),
-        t6_crisis_hard=round(t6_score, 4),
-        t4_t5_t6_combined=round(crisis_combined, 4),
-        probes_passed=passed,
-        probes_failed=failed,
-        probes_total=len(probe_results),
-        failure_modes_triggered=triggered,
-        label=LegalIQScore.compute_label(legal_iq),
+        model_name   = model_name,
+        t1_score     = round(t1, 4),
+        t2_score     = round(t2, 4),
+        t3_score     = round(t3, 4),
+        t4_score     = round(t4, 4),
+        t5_score     = round(t5, 4),
+        t6_score     = round(t6, 4),
+        crisis_score = round(crisis, 4),
+        legal_iq     = round(legal_iq, 4),
+        label        = label,
+        tier_breakdown={
+            "t1_contribution": round(TIER_WEIGHTS["t1"] * t1, 4),
+            "t2_contribution": round(TIER_WEIGHTS["t2"] * t2, 4),
+            "t3_contribution": round(TIER_WEIGHTS["t3"] * t3, 4),
+            "t4_contribution": round(CRISIS_SHARE * CRISIS_WEIGHTS["t4"] * t4, 4),
+            "t5_contribution": round(CRISIS_SHARE * CRISIS_WEIGHTS["t5"] * t5, 4),
+            "t6_contribution": round(CRISIS_SHARE * CRISIS_WEIGHTS["t6"] * t6, 4),
+            "crisis_contribution": round(CRISIS_SHARE * crisis, 4),
+        },
     )
 
 
-def print_legal_iq(score: LegalIQScore) -> None:
-    """Pretty-print the Legal IQ score breakdown."""
-    bar = "=" * 65
-    print(f"\n{bar}")
-    print(f"  L E X A R E N A   —   Legal IQ Score")
-    print(bar)
-    print(f"  {score.label}")
-    print(f"  Legal IQ:  {score.legal_iq:.4f}  ({score.legal_iq*100:.1f}/100)")
-    print(bar)
-    print(f"  {'Tier':<30} {'Raw':>6}  {'Weight':>7}  {'Contrib':>8}")
-    print(f"  {'-'*55}")
-    for ts in score.tier_scores:
-        print(f"  {ts.tier.value:<30} {ts.raw_score:>6.4f}  {ts.weight:>7.1%}  {ts.weighted_contribution:>8.4f}")
-    print(f"  {'-'*55}")
-    print(f"  {'LEGAL IQ TOTAL':<30} {'':>6}  {'100.0%':>7}  {score.legal_iq:>8.4f}")
+def score_from_results(
+    results: List[Dict],
+    model_name: str = "",
+) -> LegalIQScore:
+    """
+    Build a LegalIQScore from a list of run_task result dicts.
 
-    if score.probes_total > 0:
-        print(f"\n  Adversarial Probes: {score.probes_passed}/{score.probes_total} passed")
-        if score.failure_modes_triggered:
-            print(f"  Failure Modes Triggered: {', '.join(score.failure_modes_triggered)}")
-    print(f"{bar}\n")
+    Each dict must have 'task_id' and 'grader_score'.
+    Tiers not present default to 0.0.
+    """
+    tier_scores: Dict[str, float] = {}
+    for r in results:
+        tid   = r.get("task_id", "")
+        score = float(r.get("grader_score", 0.0))
+        # Map task_id to tier variable
+        if tid == "tier1_clause_reading":
+            tier_scores["t1"] = score
+        elif tid in ("task_1_easy", "task_2_medium", "task_3_hard"):
+            # T2 = mean of task_1/2/3
+            tier_scores.setdefault("t2_list", [])  # type: ignore[assignment]
+            tier_scores["t2_list"].append(score)    # type: ignore[index]
+        elif tid == "tier3_dependency_mapping":
+            tier_scores["t3"] = score
+        elif tid == "task_4_cascade_easy":
+            tier_scores["t4"] = score
+        elif tid == "task_5_cascade_medium":
+            tier_scores["t5"] = score
+        elif tid == "task_6_cascade_hard":
+            tier_scores["t6"] = score
+
+    # Aggregate T2
+    t2_list = tier_scores.pop("t2_list", [])  # type: ignore[arg-type]
+    t2 = sum(t2_list) / len(t2_list) if t2_list else 0.0
+
+    return compute_legal_iq(
+        t1_score   = tier_scores.get("t1", 0.0),
+        t2_score   = t2,
+        t3_score   = tier_scores.get("t3", 0.0),
+        t4_score   = tier_scores.get("t4", 0.0),
+        t5_score   = tier_scores.get("t5", 0.0),
+        t6_score   = tier_scores.get("t6", 0.0),
+        model_name = model_name,
+    )
 
 
-def compare_scores(scores: Dict[str, LegalIQScore]) -> None:
-    """Print a leaderboard comparing multiple models."""
-    ranked = sorted(scores.items(), key=lambda x: -x[1].legal_iq)
-    bar = "=" * 90
-    print(f"\n{bar}")
-    print(f"  L E X A R E N A   L E A D E R B O A R D")
-    print(bar)
-    header = f"  {'#':<3} {'Model':<28} {'LegalIQ':>8} {'T1':>6} {'T2':>6} {'T3':>6} {'T4-6':>6} {'Label':<25}"
-    print(header)
-    print(f"  {'-'*83}")
-    for rank, (model, s) in enumerate(ranked, 1):
-        print(
-            f"  {rank:<3} {model:<28} {s.legal_iq:>8.4f} "
-            f"{s.t1_reading:>6.3f} {s.t2_classification:>6.3f} "
-            f"{s.t3_dependency:>6.3f} {s.t4_t5_t6_combined:>6.3f} "
-            f"{s.label:<25}"
-        )
-    print(f"{bar}\n")
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
+
+def _get_label(score: float) -> str:
+    for lo, hi, label in LABELS:
+        if lo <= score < hi:
+            return label
+    return "Fails Legal Practice Bar"

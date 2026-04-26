@@ -1,0 +1,185 @@
+[
+  {
+    "scenario_id": "dep_001",
+    "task_meta": {
+      "name": "Force Majeure × Insurance Mutual Exclusion",
+      "difficulty": "medium",
+      "max_steps": 10
+    },
+    "contracts": [
+      {
+        "contract_id": "MSA-001",
+        "contract_type": "Master Services Agreement",
+        "parties": ["TechSupplier Ltd", "ManufacturerCo"],
+        "jurisdiction": "Delaware",
+        "key_clauses": [
+          {
+            "clause_id": "MSA-001-FM",
+            "clause_type": "force_majeure",
+            "text_excerpt": "Service Provider shall not be liable for any delay caused by Force Majeure events. Invoking Force Majeure suspends all payment obligations for the duration."
+          },
+          {
+            "clause_id": "MSA-001-SLA",
+            "clause_type": "warranty",
+            "text_excerpt": "Service Provider guarantees 99.5% uptime. Failure to meet SLA triggers a penalty of $50,000 per breach."
+          }
+        ]
+      },
+      {
+        "contract_id": "INS-001",
+        "contract_type": "Commercial Insurance Policy",
+        "parties": ["TechSupplier Ltd", "SafeGuard Insurance"],
+        "jurisdiction": "New York",
+        "key_clauses": [
+          {
+            "clause_id": "INS-001-COV",
+            "clause_type": "insurance",
+            "text_excerpt": "Coverage applies to SLA breach penalties up to $500,000 per occurrence."
+          },
+          {
+            "clause_id": "INS-001-EXCL",
+            "clause_type": "insurance",
+            "text_excerpt": "EXCLUSION: Coverage is void for any breach event where Force Majeure has been invoked by the insured on the same triggering event. Force Majeure and insurance claims are mutually exclusive."
+          }
+        ]
+      }
+    ],
+    "ground_truth_edges": [
+      {
+        "source_contract": "MSA-001",
+        "source_clause": "MSA-001-FM",
+        "target_contract": "INS-001",
+        "target_clause": "INS-001-EXCL",
+        "edge_type": "mutual_exclusion",
+        "reasoning": "Invoking Force Majeure in MSA-001 voids insurance coverage in INS-001 for the same event — cannot claim both."
+      }
+    ],
+    "difficulty_note": "Classic mutual exclusion trap (probe_fm_void). Agent must connect FM invocation to insurance exclusion."
+  },
+  {
+    "scenario_id": "dep_002",
+    "task_meta": {
+      "name": "SLA Penalty → Loan Covenant Cascade",
+      "difficulty": "hard",
+      "max_steps": 10
+    },
+    "contracts": [
+      {
+        "contract_id": "MSA-002",
+        "contract_type": "Master Services Agreement",
+        "parties": ["CloudServices Inc", "RetailCorp"],
+        "jurisdiction": "California",
+        "key_clauses": [
+          {
+            "clause_id": "MSA-002-SLA",
+            "clause_type": "warranty",
+            "text_excerpt": "Failure to maintain 99.9% uptime triggers a mandatory penalty payment of $200,000 within 5 business days."
+          },
+          {
+            "clause_id": "MSA-002-PAY",
+            "clause_type": "payment_terms",
+            "text_excerpt": "Monthly subscription fee of $50,000 payable on the first of each month."
+          }
+        ]
+      },
+      {
+        "contract_id": "LOAN-001",
+        "contract_type": "Term Loan Agreement",
+        "parties": ["RetailCorp", "NationalBank"],
+        "jurisdiction": "New York",
+        "key_clauses": [
+          {
+            "clause_id": "LOAN-001-COV",
+            "clause_type": "representations",
+            "text_excerpt": "Borrower must maintain minimum cash reserves of $500,000 at all times. Breach of this covenant constitutes an Event of Default."
+          },
+          {
+            "clause_id": "LOAN-001-DEFAULT",
+            "clause_type": "termination",
+            "text_excerpt": "Upon Event of Default, the entire outstanding loan balance becomes immediately due and payable."
+          }
+        ]
+      },
+      {
+        "contract_id": "LEASE-001",
+        "contract_type": "Office Lease",
+        "parties": ["RetailCorp", "PropertyGroup"],
+        "jurisdiction": "California",
+        "key_clauses": [
+          {
+            "clause_id": "LEASE-001-XDEF",
+            "clause_type": "termination",
+            "text_excerpt": "Cross-Default: Tenant default under any other material agreement constitutes default under this Lease, triggering a $100,000 penalty."
+          }
+        ]
+      }
+    ],
+    "ground_truth_edges": [
+      {
+        "source_contract": "MSA-002",
+        "source_clause": "MSA-002-SLA",
+        "target_contract": "LOAN-001",
+        "target_clause": "LOAN-001-COV",
+        "edge_type": "cascade_trigger",
+        "reasoning": "Paying the $200,000 SLA penalty drops RetailCorp's cash below the $500,000 covenant minimum, triggering a loan default."
+      },
+      {
+        "source_contract": "LOAN-001",
+        "source_clause": "LOAN-001-DEFAULT",
+        "target_contract": "LEASE-001",
+        "target_clause": "LEASE-001-XDEF",
+        "edge_type": "cascade_trigger",
+        "reasoning": "Loan default triggers the lease cross-default clause, adding a further $100,000 penalty."
+      }
+    ],
+    "difficulty_note": "2-hop cascade (SLA penalty → covenant breach → cross-default). Tests multi-document structural reasoning."
+  },
+  {
+    "scenario_id": "dep_003",
+    "task_meta": {
+      "name": "No Dependencies Scenario",
+      "difficulty": "easy",
+      "max_steps": 10
+    },
+    "contracts": [
+      {
+        "contract_id": "NDA-001",
+        "contract_type": "Non-Disclosure Agreement",
+        "parties": ["Party A", "Party B"],
+        "jurisdiction": "Delaware",
+        "key_clauses": [
+          {
+            "clause_id": "NDA-001-CONF",
+            "clause_type": "confidentiality",
+            "text_excerpt": "Each party agrees to hold all Confidential Information in strict confidence for a period of five years."
+          },
+          {
+            "clause_id": "NDA-001-TERM",
+            "clause_type": "termination",
+            "text_excerpt": "This Agreement terminates two years from the Effective Date unless renewed in writing."
+          }
+        ]
+      },
+      {
+        "contract_id": "SVC-001",
+        "contract_type": "Service Agreement",
+        "parties": ["Party A", "ServiceCo"],
+        "jurisdiction": "Delaware",
+        "key_clauses": [
+          {
+            "clause_id": "SVC-001-PAY",
+            "clause_type": "payment_terms",
+            "text_excerpt": "Services are billed at $150/hour, invoiced monthly, payment due Net 30."
+          },
+          {
+            "clause_id": "SVC-001-GOV",
+            "clause_type": "governing_law",
+            "text_excerpt": "This Agreement is governed by Delaware law."
+          }
+        ]
+      }
+    ],
+    "ground_truth_edges": [],
+    "difficulty_note": "No cross-document dependencies exist. Agent must correctly return empty array without hallucinating edges."
+  }
+]

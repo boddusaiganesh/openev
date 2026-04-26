@@ -1,729 +1,611 @@
 """
-LexArena — Unified API Server
-==============================
-Single FastAPI process serving ALL 6 tiers from one HF Space on port 7860.
+LexArena — Unified 6-Tier FastAPI Server
+==========================================
+Single entry point for the HF Space. Serves:
+  - Tier 2 (clause review): /reset  /step  /state
+  - Tier 1 (extraction):    /tier1/reset  /tier1/step
+  - Tier 3 (dependency):    /tier3/reset  /tier3/step
+  - Legal IQ composite:     /legal_iq  /legal_iq/leaderboard
+  - Health/info:            /  /health  /info  /curriculum
+  - Adversarial probes:     /probes  /probes/run  (scaffold)
 
-Tier 1  — Clause Reading        (CUAD, F2-weighted)
-Tier 2  — Clause Review         (OpenEnv tasks 1/2/3)
-Tier 3  — Dependency Mapping    (novel graph task)
-Tier 4  — Crisis Easy           (LexDomino in-process)
-Tier 5  — Crisis Medium
-Tier 6  — Crisis Hard
-        + Adversarial Probes
-        + Legal IQ composite
-        + Curriculum endpoint
-
-Backward-compatible routes:
-  /reset  /step  /state  → Tier 2 (original OpenEnv)
-  /cascade/*            → Tiers 4-6 (original LexDomino)
+Notes:
+  - Backward-compatible with original /reset /step /state endpoints
+  - asyncio.Lock per tier to allow concurrent tier usage
+  - Tier 4/5/6 (LexDomino cascade) endpoints are defined but return 501
+    until the cascade environment is implemented
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 import os
+import time
+import traceback
+from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
-from lexarena_models import LexArenaConfig, LegalIQScore, Tier3Action, Tier1Sample, Tier1Output
-from lexarena_scorer import compute_legal_iq
-from cuad_loader import load_cuad_dataset
-from tier1_grader import grade_sample
-from tier3_environment import Tier3MappingEnv, load_tier3_scenarios, grade_tier3_batch
-from cascade_environment import LexDominoCrisisEnv
-from cascade_models import CascadeAction, CascadeActionType
 from environment import ContractReviewEnv
-from models import Action
+from models import (
+    Action,
+    Reward,
+    StepResponse,
+    Tier1Action,
+    Tier1ExtractionSample,
+    Tier1Observation,
+    Tier3Action,
+    Tier3Observation,
+    Tier3ScenarioData,
+)
+from tasks import list_task_ids, TASK_REGISTRY
+from graders import grade_tier1_extraction, grade_tier3_dependency
+from lexarena_scorer import compute_legal_iq, score_from_results
 
-# ---------------------------------------------------------------------------
-# App
-# ---------------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("lexarena.server")
 
-_VERSION = "3.0.0"
-_PORT = int(os.getenv("PORT", "7860"))
+DATA_DIR = os.getenv("DATA_DIR", "data")
+
+
+# ===========================================================================
+# App lifecycle
+# ===========================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("=" * 60)
+    logger.info("LexArena 6-Tier Server — Starting")
+    logger.info(f"Tier 2 tasks: {list_task_ids()}")
+
+    # Tier 2 environment
+    app.state.t2_lock = asyncio.Lock()
+    app.state.t2_env  = ContractReviewEnv(data_dir=DATA_DIR)
+
+    # Validate all Tier 2 tasks on startup
+    test_env = ContractReviewEnv(data_dir=DATA_DIR)
+    for tid in list_task_ids():
+        try:
+            obs = test_env.reset(tid)
+            logger.info(f"  T2 {tid}: OK ({obs.total_clauses} clauses)")
+        except Exception as exc:
+            logger.error(f"  T2 {tid}: FAILED ({exc})")
+            raise RuntimeError(f"Task {tid} failed validation: {exc}")
+
+    # Tier 1 state (stateless, per-request; keep last sample for /state equiv)
+    app.state.t1_lock        = asyncio.Lock()
+    app.state.t1_current:    Optional[Tier1ExtractionSample] = None
+    app.state.t1_done:       bool = False
+
+    # Tier 3 state (stateless, per-request)
+    app.state.t3_lock        = asyncio.Lock()
+    app.state.t3_current:    Optional[Tier3ScenarioData] = None
+    app.state.t3_done:       bool = False
+
+    # In-memory leaderboard
+    app.state.leaderboard: List[Dict[str, Any]] = []
+
+    logger.info("All tasks validated. LexArena server ready.")
+    logger.info("=" * 60)
+
+    try:
+        yield
+    finally:
+        logger.info("LexArena Server — Shutting down")
+
 
 app = FastAPI(
     title="LexArena — Complete Legal Intelligence Benchmark",
     description=(
-        "The world's first 6-tier legal AI benchmark. "
-        "Clause reading → risk classification → dependency mapping → "
-        "systemic crisis management. Single HF Space, all tiers, one port."
+        "6-tier legal AI benchmark: clause extraction → risk classification → "
+        "dependency mapping → crisis management. "
+        "Composite Legal IQ score. Zero LLM-as-judge."
     ),
-    version=_VERSION,
+    version="3.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ---------------------------------------------------------------------------
-# Session state (per-process; adequate for HF Space single-worker usage)
-# ---------------------------------------------------------------------------
-
-# Tier 1
-_t1_samples: List[Tier1Sample] = []
-_t1_idx: int = 0
-
-# Tier 2 (OpenEnv clause review)
-_t2_env: Optional[ContractReviewEnv] = None
-_t2_task_id: str = ""
-
-# Tier 3
-_t3_env: Optional[Tier3MappingEnv] = None
-_t3_scenarios: List[dict] = []
-_t3_idx: int = 0
-_t3_results: List = []
-
-# Tiers 4-6 (LexDomino crisis)
-_cascade_env: Optional[LexDominoCrisisEnv] = None
-
-# Legal IQ leaderboard (in-memory)
-_iq_scores: Dict[str, Dict[str, Any]] = {}
-
 
 # ---------------------------------------------------------------------------
-# Health + Root Spec
+# Request / response logging middleware
 # ---------------------------------------------------------------------------
 
-@app.get("/health", tags=["Meta"])
-def health():
-    """Lightweight health check for Docker/HF Space."""
-    return {"status": "ok", "service": "LexArena", "version": _VERSION}
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    try:
+        response     = await call_next(request)
+        elapsed_ms   = (time.time() - start) * 1000
+        logger.info(
+            "%s %s -> %s (%.1fms)",
+            request.method, request.url.path, response.status_code, elapsed_ms,
+        )
+        return response
+    except Exception as exc:
+        elapsed_ms = (time.time() - start) * 1000
+        logger.error(
+            "%s %s -> 500 (%.1fms) %s",
+            request.method, request.url.path, elapsed_ms, exc,
+        )
+        return JSONResponse(status_code=500, content={"detail": "Internal server error."})
 
 
-@app.get("/", tags=["Meta"])
-def root_spec():
-    """Return the full LexArena benchmark specification."""
-    return {
-        "benchmark": "LexArena",
-        "version": _VERSION,
-        "description": (
-            "The first benchmark to test the complete legal intelligence stack: "
-            "READ → CLASSIFY → CONNECT → DECIDE → SURVIVE"
-        ),
-        "tiers": {
-            "T1": {"name": "Clause Reading", "weight": 0.15, "reset": "/tier1/reset", "step": "/tier1/step"},
-            "T2": {"name": "Risk Classification", "weight": 0.15, "reset": "/reset", "step": "/step"},
-            "T3": {"name": "Dependency Mapping", "weight": 0.20, "reset": "/tier3/reset", "step": "/tier3/step"},
-            "T4": {"name": "Crisis Easy", "weight": 0.125, "reset": "/cascade/reset", "step": "/cascade/step"},
-            "T5": {"name": "Crisis Medium", "weight": 0.175, "reset": "/cascade/reset", "step": "/cascade/step"},
-            "T6": {"name": "Crisis Hard", "weight": 0.20, "reset": "/cascade/reset", "step": "/cascade/step"},
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("Unhandled exception: %s\n%s", exc, traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {type(exc).__name__}"},
+    )
+
+
+# ===========================================================================
+# Health / Info
+# ===========================================================================
+
+@app.get("/")
+@app.get("/health")
+async def health():
+    return JSONResponse(
+        content={
+            "status": "ok",
+            "environment": "lexarena",
+            "version": "3.0.0",
+            "spec": "openenv",
+            "tiers": [1, 2, 3, 4, 5, 6],
+            "t2_tasks": list_task_ids(),
+            "legal_iq_formula": (
+                "0.15·T1 + 0.15·T2 + 0.20·T3 + "
+                "0.50·(0.25·T4 + 0.35·T5 + 0.40·T6)"
+            ),
         },
-        "legal_iq_formula": "0.15·T1 + 0.15·T2 + 0.20·T3 + 0.50·(0.25·T4 + 0.35·T5 + 0.40·T6)",
-        "scoring": "Pure deterministic math — zero LLM judges",
-        "probes": "/probes",
-        "curriculum": "/curriculum",
-        "legal_iq": "/legal_iq",
-        "leaderboard": "/legal_iq/leaderboard",
-        "docs": "/docs",
-    }
-
-
-@app.get("/curriculum", tags=["Meta"])
-def curriculum():
-    """
-    Return the recommended task order for an agent entering LexArena.
-
-    Designed to maximise learning signal: start with reading (T1),
-    progress through classification (T2), then structural reasoning (T3),
-    then crisis management (T4 → T5 → T6).
-    """
-    return {
-        "description": (
-            "Complete tiers in this order for maximum learning signal. "
-            "Each tier builds on skills from the previous one."
-        ),
-        "curriculum": [
-            {
-                "step": 1, "tier": "T1", "task": "tier1_clause_reading",
-                "goal": "Learn precise legal language extraction",
-                "reset": "/tier1/reset", "step_ep": "/tier1/step",
-                "pass_threshold": 0.50,
-                "tip": "Extract the verbatim sentence. Do not paraphrase. If absent: 'No related clause.'"
-            },
-            {
-                "step": 2, "tier": "T2a", "task": "task_1_easy",
-                "goal": "Learn clause taxonomy (15 types)",
-                "reset": "/reset", "step_ep": "/step",
-                "pass_threshold": 0.60,
-                "tip": "Start with the template. Focus on clause_type accuracy."
-            },
-            {
-                "step": 3, "tier": "T2b", "task": "task_2_medium",
-                "goal": "Add risk assessment and issue flagging",
-                "reset": "/reset", "step_ep": "/step",
-                "pass_threshold": 0.55,
-                "tip": "Read for both type AND risk. 'missing_liability_cap' is the most common missed flag."
-            },
-            {
-                "step": 4, "tier": "T2c", "task": "task_3_hard",
-                "goal": "Full contract review with cross-clause reasoning",
-                "reset": "/reset", "step_ep": "/step",
-                "pass_threshold": 0.50,
-                "tip": "Check for conflicting clauses. Look at the full contract before analysing each clause."
-            },
-            {
-                "step": 5, "tier": "T3", "task": "tier3_dependency_mapping",
-                "goal": "Map hidden dependency edges between contracts",
-                "reset": "/tier3/reset", "step_ep": "/tier3/step",
-                "pass_threshold": 0.40,
-                "tip": (
-                    "Focus on edge types: cascade_trigger, mutual_exclusion, condition_precedent. "
-                    "Ask: does invoking clause X change the legal validity of clause Y?"
-                )
-            },
-            {
-                "step": 6, "tier": "T4", "task": "task_4_cascade_easy",
-                "goal": "Survive a 15-day single-contract crisis",
-                "reset": "/cascade/reset", "step_ep": "/cascade/step",
-                "pass_threshold": 0.65,
-                "tip": (
-                    "Always investigate and cross_reference FIRST. "
-                    "Act on the soonest deadline. Never pay without checking legal position."
-                )
-            },
-            {
-                "step": 7, "tier": "T5", "task": "task_5_cascade_medium",
-                "goal": "Multi-contract crisis with hidden dependencies",
-                "reset": "/cascade/reset", "step_ep": "/cascade/step",
-                "pass_threshold": 0.55,
-                "tip": (
-                    "Check debt covenants before paying any penalty. "
-                    "Assess counterparty risk early — aggressive profiles escalate if ignored."
-                )
-            },
-            {
-                "step": 8, "tier": "T6", "task": "task_6_cascade_hard",
-                "goal": "30-day systemic cascade with compound shocks",
-                "reset": "/cascade/reset", "step_ep": "/cascade/step",
-                "pass_threshold": 0.45,
-                "tip": (
-                    "Day 1: file insurance BEFORE invoking Force Majeure. "
-                    "Day 14-16: expect a second shock. Reserve cash. "
-                    "Never cave to unverified aggressive demands — check legal position first."
-                )
-            },
-        ],
-        "legal_iq_endpoint": "/legal_iq",
-    }
-
-
-# ---------------------------------------------------------------------------
-# Tier 1 — Clause Reading (CUAD)
-# ---------------------------------------------------------------------------
-
-class Tier1ResetRequest(BaseModel):
-    max_samples: int = 15
-    priority_only: bool = True
-
-
-class Tier1StepRequest(BaseModel):
-    sample_id: str
-    extracted_text: str
-
-
-@app.post("/tier1/reset", tags=["Tier 1 — Clause Reading"])
-def tier1_reset(req: Tier1ResetRequest):
-    """Load CUAD samples and return the first one."""
-    global _t1_samples, _t1_idx
-    _t1_samples = load_cuad_dataset(
-        max_samples=req.max_samples,
-        priority_only=req.priority_only,
-    )
-    _t1_idx = 0
-    sample = _t1_samples[0] if _t1_samples else None
-    return {
-        "total_samples": len(_t1_samples),
-        "current_index": 0,
-        "current_sample": sample.model_dump() if sample else None,
-        "instructions": (
-            "Extract the verbatim sentence that answers the question. "
-            "Do NOT paraphrase. If no clause applies, respond: 'No related clause.'"
-        ),
-    }
-
-
-@app.post("/tier1/step", tags=["Tier 1 — Clause Reading"])
-def tier1_step(req: Tier1StepRequest):
-    """Submit an extraction and receive score + corrective feedback."""
-    global _t1_idx
-    if not _t1_samples:
-        raise HTTPException(400, "Call /tier1/reset first.")
-    if _t1_idx >= len(_t1_samples):
-        raise HTTPException(400, "All samples exhausted. Call /tier1/reset.")
-
-    sample = _t1_samples[_t1_idx]
-    output = Tier1Output(
-        sample_id=req.sample_id,
-        extracted_text=req.extracted_text,
-        is_no_clause="no related clause" in req.extracted_text.lower(),
-    )
-    result = grade_sample(sample, output)
-
-    # Build corrective feedback for the model
-    feedback = _build_t1_feedback(sample, req.extracted_text, result)
-
-    _t1_idx += 1
-    next_sample = _t1_samples[_t1_idx].model_dump() if _t1_idx < len(_t1_samples) else None
-
-    return {
-        "sample_result": result.model_dump(),
-        "corrective_feedback": feedback,
-        "samples_remaining": len(_t1_samples) - _t1_idx,
-        "next_sample": next_sample,
-        "done": next_sample is None,
-    }
-
-
-def _build_t1_feedback(sample: Tier1Sample, extracted: str, result) -> str:
-    """Generate corrective feedback for a Tier 1 extraction step."""
-    f2 = result.f2_score
-    gt = sample.ground_truth[0] if sample.ground_truth else ""
-
-    if result.is_no_clause_correct:
-        return "Correct. No applicable clause exists in this contract section."
-
-    if result.false_laziness:
-        return (
-            f"Incorrect: you responded 'No related clause' but one exists. "
-            f"The correct answer was: \"{gt[:200]}\". "
-            f"Legal principle: missing a material clause (false negative) is a critical error "
-            f"in contract review — it means the risk goes unnoticed."
-        )
-
-    if f2 >= 0.85:
-        return "Correct extraction. Strong precision and recall."
-
-    if f2 >= 0.50:
-        return (
-            f"Partially correct (F2={f2:.2f}). Ground truth: \"{gt[:200]}\". "
-            f"Tip: extract the exact sentence, not a summary. "
-            f"F2 is recall-weighted — missing words costs more than extra words."
-        )
-
-    return (
-        f"Incorrect (F2={f2:.2f}). Ground truth: \"{gt[:200]}\". "
-        f"You extracted: \"{extracted[:200]}\". "
-        f"Rule: Copy the verbatim sentence from the contract text. Do not rephrase."
+        status_code=200,
     )
 
 
-@app.get("/tier1/sample", tags=["Tier 1 — Clause Reading"])
-def tier1_current():
-    if not _t1_samples or _t1_idx >= len(_t1_samples):
-        return {"sample": None, "done": True}
-    return {"sample": _t1_samples[_t1_idx].model_dump(), "index": _t1_idx, "total": len(_t1_samples)}
-
-
-# ---------------------------------------------------------------------------
-# Tier 2 — Clause Review (backward-compatible OpenEnv routes)
-# ---------------------------------------------------------------------------
-
-class ResetRequest(BaseModel):
-    task_id: str
-
-
-@app.post("/reset", tags=["Tier 2 — Clause Review"])
-def tier2_reset(req: ResetRequest):
-    """Reset the clause review environment (backward-compatible with OpenEnv)."""
-    global _t2_env, _t2_task_id
-    _t2_env = ContractReviewEnv()
-    _t2_task_id = req.task_id
-    obs = _t2_env.reset(req.task_id)
-    return obs.model_dump()
-
-
-@app.post("/step", tags=["Tier 2 — Clause Review"])
-def tier2_step(action_dict: Dict[str, Any]):
-    """Submit a clause review action (backward-compatible with OpenEnv)."""
-    if _t2_env is None:
-        raise HTTPException(400, "Call /reset first.")
-    action = Action(**action_dict)
-    obs, reward, done, info = _t2_env.step(action)
-    obs_dict = obs.model_dump()
-
-    # Build corrective feedback from ground-truth data in info
-    obs_dict["corrective_feedback"] = _build_t2_feedback(
-        action_dict, info, reward.model_dump()
-    )
-
-    return {
-        "observation": obs_dict,
-        "reward": reward.model_dump(),
-        "done": done,
-        "info": info,
-    }
-
-
-def _build_t2_feedback(action_dict: Dict[str, Any], info: Dict[str, Any], reward_dict: Dict[str, Any]) -> str:
-    """Generate corrective feedback for a Tier 2 clause review step."""
-    gt = info.get("current_clause_ground_truth", {})
-    if not gt:
-        return ""
-
-    action_type = action_dict.get("action_type", "")
-    score = reward_dict.get("score", 0.0)
-
-    if action_type == "classify":
-        submitted = action_dict.get("clause_type", "?")
-        correct = gt.get("clause_type", "?")
-        if submitted == correct:
-            return f"Correct. This is a '{correct}' clause."
-        return (
-            f"Incorrect classification. You submitted '{submitted}', "
-            f"but this is a '{correct}' clause. "
-            f"Key indicator: look for the operative obligation language, not the subject matter."
-        )
-
-    if action_type == "rate_severity":
-        submitted = action_dict.get("risk_level", "?")
-        correct = gt.get("risk_level", "?")
-        if submitted == correct:
-            return f"Correct risk level: '{correct}'."
-        return (
-            f"Incorrect risk level. You submitted '{submitted}', correct is '{correct}'. "
-            f"Risk escalates when liability is uncapped, obligations are one-sided, "
-            f"or the clause conflicts with another in the same contract."
-        )
-
-    if action_type == "flag":
-        submitted_flags = set(action_dict.get("flags", []))
-        correct_flags = set(gt.get("flags", []))
-        missed = correct_flags - submitted_flags
-        extra = submitted_flags - correct_flags
-        parts = []
-        if missed:
-            parts.append(f"Missed flag(s): {', '.join(missed)}.")
-        if extra:
-            parts.append(f"False positive flag(s): {', '.join(extra)}.")
-        if not parts:
-            return "Correct flags identified."
-        return " ".join(parts)
-
-    if action_type == "suggest":
-        submitted = action_dict.get("suggested_action", "?")
-        correct = gt.get("suggested_action", "?")
-        if submitted == correct:
-            return f"Correct suggested action: '{correct}'."
-        return (
-            f"Suggested action mismatch. You submitted '{submitted}', "
-            f"expected '{correct}'. Higher-risk clauses require escalation "
-            f"or rejection rather than simple flagging."
-        )
-
-    return f"Step score: {score:.3f}."
-
-
-
-@app.get("/state", tags=["Tier 2 — Clause Review"])
-def tier2_state():
-    """Return current environment state."""
-    if _t2_env is None:
-        raise HTTPException(400, "No active session. Call /reset first.")
-    return _t2_env.state().model_dump()
-
-
-# ---------------------------------------------------------------------------
-# Tier 3 — Dependency Mapping
-# ---------------------------------------------------------------------------
-
-class Tier3ResetRequest(BaseModel):
-    scenario_index: int = 0
-    time_budget: int = 10
-
-
-@app.post("/tier3/reset", tags=["Tier 3 — Dependency Mapping"])
-def tier3_reset(req: Tier3ResetRequest):
-    """Load a dependency mapping scenario and return contract summaries."""
-    global _t3_env, _t3_scenarios, _t3_idx, _t3_results
-    _t3_scenarios = load_tier3_scenarios()
-    _t3_results = []
-    if not _t3_scenarios:
-        raise HTTPException(404, "No scenarios found.")
-    idx = req.scenario_index % len(_t3_scenarios)
-    _t3_idx = idx
-    _t3_env = Tier3MappingEnv(time_budget=req.time_budget)
-    obs = _t3_env.reset(_t3_scenarios[idx])
-    obs_dict = obs.model_dump()
-    obs_dict["instructions"] = (
-        "You are given multiple contracts. Your task: identify ALL hidden dependency edges "
-        "between clauses across different contracts. Submit a JSON list of dependencies. "
-        "Edge types: cascade_trigger, mutual_exclusion, condition_precedent, supersession, temporal_gate."
-    )
-    return obs_dict
-
-
-@app.post("/tier3/step", tags=["Tier 3 — Dependency Mapping"])
-def tier3_step(action: Tier3Action):
-    """Submit a dependency graph and receive precision/recall feedback."""
-    if _t3_env is None:
-        raise HTTPException(400, "Call /tier3/reset first.")
-    obs, result = _t3_env.step(action)
-    resp = {"observation": obs.model_dump(), "result": None, "corrective_feedback": ""}
-    if result:
-        _t3_results.append(result)
-        resp["result"] = result.model_dump()
-        resp["corrective_feedback"] = _build_t3_feedback(result)
-    return resp
-
-
-def _build_t3_feedback(result) -> str:
-    """Corrective feedback for a Tier 3 dependency mapping submission."""
-    r = result.recall
-    p = result.precision
-    missed = getattr(result, "missed_edges", [])
-    false_pos = getattr(result, "false_positive_edges", [])
-
-    lines = [f"Recall={r:.2f}, Precision={p:.2f}."]
-    if missed:
-        edge = missed[0]
-        lines.append(
-            f"Missed edge: '{edge.get('source_clause','?')}' → '{edge.get('target_clause','?')}' "
-            f"({edge.get('edge_type','?')}). "
-            f"Tip: check if invoking any clause changes the validity of another."
-        )
-    if false_pos:
-        lines.append(
-            f"{len(false_pos)} false positive(s): edges you identified that do not exist "
-            f"in ground truth. Only submit edges where you can cite specific clause language."
-        )
-    if r >= 0.9 and p >= 0.9:
-        lines = ["Excellent. All critical dependency edges found with high precision."]
-    return " ".join(lines)
-
-
-@app.get("/tier3/score", tags=["Tier 3 — Dependency Mapping"])
-def tier3_score():
-    if not _t3_results:
-        return {"score": None, "message": "No completed scenarios yet."}
-    return grade_tier3_batch(_t3_results).model_dump()
-
-
-# ---------------------------------------------------------------------------
-# Tiers 4-6 — LexDomino Crisis (backward-compatible /cascade/* routes)
-# ---------------------------------------------------------------------------
-
-class CascadeResetRequest(BaseModel):
-    task_id: str
-    scenario_index: int = 0
-
-
-@app.post("/cascade/reset", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_reset(req: CascadeResetRequest):
-    """Reset a LexDomino crisis scenario."""
-    global _cascade_env
-    _cascade_env = LexDominoCrisisEnv()
-    obs = _cascade_env.reset(req.task_id, req.scenario_index)
-    obs_dict = obs.model_dump()
-    obs_dict["corrective_feedback"] = (
-        "Episode started. Review your inbox first. Identify all deadlines. "
-        "Cross-reference contracts before taking financial actions."
-    )
-    return obs_dict
-
-
-@app.post("/cascade/step", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_step(action: CascadeAction):
-    """Submit a crisis management action."""
-    if _cascade_env is None:
-        raise HTTPException(400, "Call /cascade/reset first.")
-    obs, reward, done, info = _cascade_env.step(action)
-    obs_dict = obs.model_dump()
-    # Build corrective feedback from cascade info
-    obs_dict["corrective_feedback"] = _build_cascade_feedback(action, info, reward.model_dump())
-    return {
-        "observation": obs_dict,
-        "reward": reward.model_dump(),
-        "done": done,
-        "info": info,
-    }
-
-
-def _build_cascade_feedback(action: CascadeAction, info: Dict[str, Any], reward_dict: Dict[str, Any]) -> str:
-    """Generate corrective feedback for a crisis management step."""
-    score = reward_dict.get("score", 0.0)
-    reason = reward_dict.get("reason", "")
-    action_type = action.action_type.value if hasattr(action.action_type, "value") else str(action.action_type)
-
-    bankruptcy = info.get("bankruptcy", False)
-    if bankruptcy:
-        return (
-            "BANKRUPTCY. The company ran out of cash or violated its debt covenant. "
-            "Critical rule: always protect cash first. Draw credit facility before "
-            "paying any penalty. Never pay a demand without verifying its legal validity."
-        )
-
-    if score > 0.1:
-        return f"Good action ({action_type}). {reason}" if reason else f"Good action ({action_type})."
-
-    if action_type in ("invoke_force_majeure",):
-        return (
-            f"Low reward for '{action_type}'. "
-            f"Check: did you file an insurance claim FIRST? "
-            f"Invoking Force Majeure before filing insurance may void your coverage (mutual exclusion clause)."
-        )
-
-    if action_type == "pay_penalty":
-        return (
-            f"Low reward for '{action_type}'. "
-            f"Check: is this penalty legally enforceable? "
-            f"Use 'assess_counterparty_risk' and 'cross_reference_contracts' before paying any demand. "
-            f"Aggressive counterparties often claim penalties that are time-barred or superseded."
-        )
-
-    if action_type == "advance_day" and score <= 0:
-        return (
-            "Advancing the day with active unaddressed deadlines loses time. "
-            "Review 'active_deadlines' in the observation and act on the most urgent one."
-        )
-
-    return f"Action '{action_type}' scored {score:.3f}. {reason}" if reason else f"Action '{action_type}' scored {score:.3f}."
-
-
-
-@app.get("/cascade/state", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_state():
-    if _cascade_env is None:
-        raise HTTPException(400, "No active crisis session.")
-    return _cascade_env.state().model_dump()
-
-
-@app.get("/cascade/actions", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_actions():
-    return {"available_actions": [a.value for a in CascadeActionType]}
-
-
-@app.get("/cascade/deadlines", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_deadlines():
-    if _cascade_env is None:
-        raise HTTPException(400, "No active session.")
-    state = _cascade_env.state()
-    return {"deadlines": [d.model_dump() for d in _cascade_env.deadlines]}
-
-
-@app.get("/cascade/metrics", tags=["Tiers 4-6 — Crisis Management"])
-def cascade_metrics():
-    if _cascade_env is None:
-        raise HTTPException(400, "No active session.")
-    state = _cascade_env.state()
-    return {
-        "cash_balance": _cascade_env.financial_state.cash_balance,
-        "bankruptcy": _cascade_env.bankruptcy,
-        "current_day": _cascade_env.current_day,
-        "step_number": _cascade_env.step_number,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Legal IQ — Composite Score
-# ---------------------------------------------------------------------------
-
-class LegalIQRequest(BaseModel):
-    model_name: str = "agent"
-    t1_score: float = 0.0
-    t2_score: float = 0.0
-    t3_score: float = 0.0
-    t4_score: float = 0.0
-    t5_score: float = 0.0
-    t6_score: float = 0.0
-
-
-@app.post("/legal_iq", tags=["Legal IQ"])
-def compute_iq(req: LegalIQRequest):
-    """Compute the Legal IQ composite score from tier scores."""
-    score = compute_legal_iq(
-        t1_score=req.t1_score, t2_score=req.t2_score, t3_score=req.t3_score,
-        t4_score=req.t4_score, t5_score=req.t5_score, t6_score=req.t6_score,
-    )
-    _iq_scores[req.model_name] = score.model_dump()
-    return score.model_dump()
-
-
-@app.get("/legal_iq/leaderboard", tags=["Legal IQ"])
-def leaderboard():
-    """Return all scored models ranked by Legal IQ."""
-    ranked = sorted(_iq_scores.items(), key=lambda x: -x[1]["legal_iq"])
-    return {
-        "leaderboard": [
-            {"rank": i + 1, "model": m, **{k: v for k, v in d.items()}}
-            for i, (m, d) in enumerate(ranked)
-        ]
-    }
-
-
-@app.get("/legal_iq/weights", tags=["Legal IQ"])
-def weights():
-    return {
-        "formula": "Legal_IQ = 0.15·T1 + 0.15·T2 + 0.20·T3 + 0.50·(0.25·T4 + 0.35·T5 + 0.40·T6)",
-        "rationale": "Crisis management (50%) is weighted highest — impossible to fake with legal fine-tuning.",
-        "tier_weights": {"T1": "15%", "T2": "15%", "T3": "20%", "T4-6": "50%"},
-        "crisis_sub_weights": {"T4": "12.5%", "T5": "17.5%", "T6": "20%"},
-        "scoring": "Pure math. Zero LLM judges.",
-    }
-
-
-# ---------------------------------------------------------------------------
-# Adversarial Probes
-# ---------------------------------------------------------------------------
-
-@app.get("/probes", tags=["Adversarial Probes"])
-def list_probes():
-    """List all 10 adversarial probe scenarios and their failure modes."""
-    probe_dir = os.path.join("data", "probes")
-    if not os.path.exists(probe_dir):
-        return {"probes": [], "total": 0}
-    probes = []
-    for fname in sorted(os.listdir(probe_dir)):
-        if not fname.endswith(".json"):
-            continue
-        with open(os.path.join(probe_dir, fname), encoding="utf-8") as fp:
-            d = json.load(fp)
-        probes.append({
-            "probe_id": d.get("probe_id"),
-            "failure_mode": d.get("failure_mode"),
-            "description": d.get("description"),
+@app.get("/info")
+async def info():
+    tasks_info = []
+    for tid, tc in TASK_REGISTRY.items():
+        tasks_info.append({
+            "task_id":         tc.task_id,
+            "name":            tc.name,
+            "difficulty":      tc.difficulty.value,
+            "description":     tc.description,
+            "max_steps":       tc.max_steps,
+            "required_actions": [a.value for a in tc.required_action_types],
+            "grader_weights":  tc.grader_weights,
+            "tier":            getattr(tc, "task_tier", 2),
         })
-    return {"probes": probes, "total": len(probes)}
+    return JSONResponse(content={
+        "environment": "lexarena",
+        "version": "3.0.0",
+        "tiers": 6,
+        "t2_tasks": tasks_info,
+        "endpoints": {
+            "health":     "GET /",
+            "info":       "GET /info",
+            "curriculum": "GET /curriculum",
+            "t2_reset":   "POST /reset",
+            "t2_step":    "POST /step",
+            "t2_state":   "GET /state",
+            "t1_reset":   "POST /tier1/reset",
+            "t1_step":    "POST /tier1/step",
+            "t3_reset":   "POST /tier3/reset",
+            "t3_step":    "POST /tier3/step",
+            "legal_iq":   "POST /legal_iq",
+            "leaderboard": "GET /legal_iq/leaderboard",
+            "probes":     "GET /probes",
+            "probe_run":  "POST /probes/run",
+        },
+    }, status_code=200)
 
 
-@app.get("/probes/{probe_id}", tags=["Adversarial Probes"])
-def get_probe(probe_id: str):
-    """Return the full scenario data for one adversarial probe."""
-    path = os.path.join("data", "probes", f"{probe_id}.json")
+@app.get("/curriculum")
+async def curriculum():
+    """Describe the recommended curriculum progression."""
+    return JSONResponse(content={
+        "progression": [
+            {"tier": 1, "task": "tier1_clause_reading",    "endpoint": "/tier1/reset",   "difficulty": "extraction"},
+            {"tier": 2, "task": "task_1_easy",             "endpoint": "/reset",          "difficulty": "easy"},
+            {"tier": 2, "task": "task_2_medium",           "endpoint": "/reset",          "difficulty": "medium"},
+            {"tier": 2, "task": "task_3_hard",             "endpoint": "/reset",          "difficulty": "hard"},
+            {"tier": 3, "task": "tier3_dependency_mapping", "endpoint": "/tier3/reset",   "difficulty": "novel"},
+            {"tier": 4, "task": "task_4_cascade_easy",     "endpoint": "/cascade/reset",  "difficulty": "cascade_easy"},
+            {"tier": 5, "task": "task_5_cascade_medium",   "endpoint": "/cascade/reset",  "difficulty": "cascade_medium"},
+            {"tier": 6, "task": "task_6_cascade_hard",     "endpoint": "/cascade/reset",  "difficulty": "cascade_hard"},
+        ],
+        "tip": (
+            "Start with Tier 1 and 2. Only advance to Tier 3 once your model "
+            "achieves >0.50 on task_2_medium. Tiers 4-6 require a capable "
+            "strategic reasoner (generally >7B parameters)."
+        ),
+    })
+
+
+# ===========================================================================
+# Tier 2 — Clause Review (backward-compatible)
+# ===========================================================================
+
+@app.post("/reset")
+async def t2_reset(request: Optional[Dict[str, Any]] = None):
+    env  = app.state.t2_env
+    lock = app.state.t2_lock
+    try:
+        request    = request or {}
+        task_id    = request.get("task_id") or (list_task_ids()[0] if list_task_ids() else "task_1_easy")
+        sc_idx     = request.get("scenario_index")
+        logger.info("T2 RESET: task_id=%s", task_id)
+        async with lock:
+            obs = env.reset(task_id, scenario_index=sc_idx)
+        return obs.model_dump()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error("T2 RESET FAILED: %s\n%s", e, traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/step")
+async def t2_step(action_data: Optional[Dict[str, Any]] = None):
+    env  = app.state.t2_env
+    lock = app.state.t2_lock
+    action_data = action_data or {}
+
+    if not action_data:
+        async with lock:
+            if env.task_config is None:
+                obs = env._build_empty_observation()
+            else:
+                obs = env._build_observation("No action provided.")
+        return StepResponse(
+            observation=obs,
+            reward=Reward(score=0.0, message="No action provided."),
+            done=env.done,
+            info=env._build_info(),
+        ).model_dump()
+
+    if env.task_config is None:
+        raise HTTPException(status_code=400, detail="No active episode. Call POST /reset first.")
+    if "action_type" not in action_data:
+        raise HTTPException(status_code=400, detail="Missing action_type.")
+
+    try:
+        action = Action(**action_data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid action payload: {e}")
+
+    try:
+        async with lock:
+            obs, reward, done, step_info = env.step(action)
+        if done and env.grader_result:
+            logger.info(
+                "T2 EPISODE DONE: task=%s score=%.4f",
+                env.task_config.task_id if env.task_config else "?",
+                float(env.grader_result.score),
+            )
+        return StepResponse(observation=obs, reward=reward, done=done, info=step_info).model_dump()
+    except Exception as e:
+        logger.error("T2 STEP FAILED: %s\n%s", e, traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/state")
+async def t2_state():
+    env  = app.state.t2_env
+    lock = app.state.t2_lock
+    try:
+        async with lock:
+            env_state = env.state()
+        return env_state.model_dump()
+    except Exception as e:
+        logger.error("T2 STATE FAILED: %s\n%s", e, traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ===========================================================================
+# Tier 1 — Clause Extraction
+# ===========================================================================
+
+def _load_tier1_samples() -> List[Dict[str, Any]]:
+    """Load Tier 1 extraction samples from data/tier1_extraction/."""
+    path = os.path.join(DATA_DIR, "tier1_extraction", "samples.json")
     if not os.path.exists(path):
-        raise HTTPException(404, f"Probe not found: {probe_id}")
-    with open(path, encoding="utf-8") as f:
+        return []
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-@app.post("/probes/run", tags=["Adversarial Probes"])
-def run_probe(body: Dict[str, Any]):
-    """
-    Run a single adversarial probe in-process.
-    Body: {"probe_id": "probe_fm_void", "strategy": "deadline_first"}
-    """
-    from probe_runner import ProbeRunner
-    probe_id = body.get("probe_id")
-    strategy = body.get("strategy", "deadline_first")
-    if not probe_id:
-        raise HTTPException(400, "probe_id is required.")
-    runner = ProbeRunner()
-    result = runner.run_probe(probe_id, strategy=strategy, verbose=False)
-    return result.model_dump()
+@app.post("/tier1/reset")
+async def tier1_reset(request: Optional[Dict[str, Any]] = None):
+    request = request or {}
+    samples = _load_tier1_samples()
+    if not samples:
+        raise HTTPException(
+            status_code=503,
+            detail="Tier 1 samples not loaded. Ensure data/tier1_extraction/samples.json exists.",
+        )
+    idx = int(request.get("sample_index", 0)) % len(samples)
+    sample_dict = samples[idx]
+    sample = Tier1ExtractionSample(**sample_dict)
+
+    async with app.state.t1_lock:
+        app.state.t1_current = sample
+        app.state.t1_done    = False
+
+    obs = Tier1Observation(
+        sample_id         = sample.sample_id,
+        contract_name     = sample.contract_name,
+        question_category = sample.question_category,
+        question          = sample.question,
+        context           = sample.context,
+        has_answer        = sample.has_answer,
+    )
+    logger.info("T1 RESET: sample_id=%s category=%s", sample.sample_id, sample.question_category)
+    return obs.model_dump()
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
+@app.post("/tier1/step")
+async def tier1_step(action_data: Optional[Dict[str, Any]] = None):
+    action_data = action_data or {}
+    async with app.state.t1_lock:
+        sample = app.state.t1_current
+        done   = app.state.t1_done
+
+    if sample is None:
+        raise HTTPException(status_code=400, detail="No active Tier 1 episode. Call /tier1/reset first.")
+    if done:
+        return {"done": True, "message": "Tier 1 episode already complete."}
+
+    extracted = action_data.get("extracted_text", "")
+    if not extracted:
+        raise HTTPException(status_code=400, detail="extracted_text is required.")
+
+    result = grade_tier1_extraction(sample, extracted)
+
+    async with app.state.t1_lock:
+        app.state.t1_done = True
+
+    logger.info("T1 STEP: sample=%s score=%.4f", sample.sample_id, float(result.score))
+    return {
+        "done":       True,
+        "score":      float(result.score),
+        "breakdown":  result.breakdown,
+        "message":    result.message,
+        "corrective_feedback": result.message,
+    }
+
+
+# ===========================================================================
+# Tier 3 — Dependency Graph Mapping
+# ===========================================================================
+
+def _load_tier3_scenarios() -> List[Dict[str, Any]]:
+    path = os.path.join(DATA_DIR, "tier3_dependency", "scenarios.json")
+    if not os.path.exists(path):
+        return []
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.post("/tier3/reset")
+async def tier3_reset(request: Optional[Dict[str, Any]] = None):
+    request   = request or {}
+    scenarios = _load_tier3_scenarios()
+    if not scenarios:
+        raise HTTPException(
+            status_code=503,
+            detail="Tier 3 scenarios not loaded. Ensure data/tier3_dependency/scenarios.json exists.",
+        )
+    idx  = int(request.get("scenario_index", 0)) % len(scenarios)
+    s    = scenarios[idx]
+    task_meta = s.get("task_meta", {})
+    max_steps = task_meta.get("max_steps", 10)
+
+    async with app.state.t3_lock:
+        app.state.t3_current = s
+        app.state.t3_done    = False
+
+    obs = Tier3Observation(
+        scenario_id     = s.get("scenario_id", f"scenario_{idx}"),
+        contracts       = s.get("contracts", []),
+        steps_remaining = max_steps,
+    )
+    logger.info("T3 RESET: scenario_id=%s", obs.scenario_id)
+    return obs.model_dump()
+
+
+@app.post("/tier3/step")
+async def tier3_step(action_data: Optional[Dict[str, Any]] = None):
+    action_data = action_data or {}
+    async with app.state.t3_lock:
+        scenario = app.state.t3_current
+        done     = app.state.t3_done
+
+    if scenario is None:
+        raise HTTPException(status_code=400, detail="No active Tier 3 episode. Call /tier3/reset first.")
+    if done:
+        return {"done": True, "message": "Tier 3 episode already complete."}
+
+    predicted_edges   = action_data.get("dependencies", [])
+    ground_truth_edges = scenario.get("ground_truth_edges", [])
+
+    result = grade_tier3_dependency(predicted_edges, ground_truth_edges)
+
+    async with app.state.t3_lock:
+        app.state.t3_done = True
+
+    logger.info(
+        "T3 STEP: scenario=%s score=%.4f",
+        scenario.get("scenario_id", "?"),
+        float(result.score),
+    )
+    return {
+        "done":              True,
+        "score":             float(result.score),
+        "breakdown":         result.breakdown,
+        "message":           result.message,
+        "corrective_feedback": result.message,
+    }
+
+
+# ===========================================================================
+# Tiers 4–6 — Cascade (scaffold — awaiting cascade_environment.py)
+# ===========================================================================
+
+@app.post("/cascade/reset")
+async def cascade_reset(request: Optional[Dict[str, Any]] = None):
+    raise HTTPException(
+        status_code=501,
+        detail=(
+            "Tiers 4-6 (LexDomino cascade) are not yet implemented. "
+            "Complete Tiers 1-3 first. Set TIERS=1,2,3 to skip cascade."
+        ),
+    )
+
+
+@app.post("/cascade/step")
+async def cascade_step(action_data: Optional[Dict[str, Any]] = None):
+    raise HTTPException(status_code=501, detail="Cascade environment not yet implemented.")
+
+
+@app.get("/cascade/state")
+async def cascade_state():
+    raise HTTPException(status_code=501, detail="Cascade environment not yet implemented.")
+
+
+@app.get("/cascade/actions")
+async def cascade_actions():
+    raise HTTPException(status_code=501, detail="Cascade environment not yet implemented.")
+
+
+@app.get("/cascade/deadlines")
+async def cascade_deadlines():
+    raise HTTPException(status_code=501, detail="Cascade environment not yet implemented.")
+
+
+@app.get("/cascade/metrics")
+async def cascade_metrics():
+    raise HTTPException(status_code=501, detail="Cascade environment not yet implemented.")
+
+
+# ===========================================================================
+# Legal IQ Composite Score
+# ===========================================================================
+
+@app.post("/legal_iq")
+async def legal_iq_compute(payload: Optional[Dict[str, Any]] = None):
+    """
+    Compute Legal IQ from per-tier scores.
+
+    POST body: {"results": [...run_task result dicts...], "model_name": "..."}
+    OR:        {"t1": 0.7, "t2": 0.6, "t3": 0.4, "t4": 0.0, "t5": 0.0, "t6": 0.0}
+    """
+    payload    = payload or {}
+    model_name = payload.get("model_name", "")
+
+    if "results" in payload:
+        iq = score_from_results(payload["results"], model_name=model_name)
+    else:
+        iq = compute_legal_iq(
+            t1_score   = float(payload.get("t1", 0.0)),
+            t2_score   = float(payload.get("t2", 0.0)),
+            t3_score   = float(payload.get("t3", 0.0)),
+            t4_score   = float(payload.get("t4", 0.0)),
+            t5_score   = float(payload.get("t5", 0.0)),
+            t6_score   = float(payload.get("t6", 0.0)),
+            model_name = model_name,
+        )
+
+    # Auto-append to leaderboard if model_name provided
+    if model_name:
+        entry = iq.model_dump()
+        entry["timestamp"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        app.state.leaderboard.append(entry)
+        # Keep only top 100
+        app.state.leaderboard = sorted(
+            app.state.leaderboard, key=lambda x: x["legal_iq"], reverse=True
+        )[:100]
+
+    logger.info("LEGAL_IQ: model=%s iq=%.4f label=%s", model_name, iq.legal_iq, iq.label)
+    return iq.model_dump()
+
+
+@app.get("/legal_iq/leaderboard")
+async def legal_iq_leaderboard():
+    return JSONResponse(content={
+        "leaderboard": app.state.leaderboard,
+        "count": len(app.state.leaderboard),
+    })
+
+
+# ===========================================================================
+# Adversarial Probes (scaffold)
+# ===========================================================================
+
+PROBE_DEFINITIONS = [
+    {"id": "probe_fm_void",            "description": "Invoking FM voids insurance (mutual exclusion trap)"},
+    {"id": "probe_sycophancy",         "description": "Aggressive counterparty demand that is legally invalid"},
+    {"id": "probe_covenant_blindness", "description": "Missing that penalty payment breaches debt covenant"},
+    {"id": "probe_cross_default",      "description": "Judgment in Contract A triggers cross-default in B"},
+    {"id": "probe_deadline_stack",     "description": "Three deadlines in 48 hours requiring prioritisation"},
+    {"id": "probe_key_person_chain",   "description": "3-hop dependency: bonus → departure → license loss"},
+    {"id": "probe_false_urgency",      "description": "Counterparty creates fake urgency for non-binding demand"},
+    {"id": "probe_supersession",       "description": "Later clause overrides earlier clause — agent must find it"},
+    {"id": "probe_compound_shock",     "description": "Primary crisis + secondary shock 10 days later"},
+    {"id": "probe_lazy_reader",        "description": "Scenario where 'No related clause' is always wrong"},
+]
+
+
+@app.get("/probes")
+async def probes_list():
+    return JSONResponse(content={"probes": PROBE_DEFINITIONS, "count": len(PROBE_DEFINITIONS)})
+
+
+@app.post("/probes/run")
+async def probe_run(payload: Optional[Dict[str, Any]] = None):
+    payload  = payload or {}
+    probe_id = payload.get("probe_id", "")
+    probe    = next((p for p in PROBE_DEFINITIONS if p["id"] == probe_id), None)
+    if not probe:
+        raise HTTPException(status_code=404, detail=f"Probe '{probe_id}' not found.")
+    raise HTTPException(
+        status_code=501,
+        detail=f"Probe '{probe_id}' is defined but not yet implemented. Implement cascade first.",
+    )
+
+
+# ===========================================================================
+# Misc utility
+# ===========================================================================
+
+@app.options("/")
+async def options_root():
+    return JSONResponse(content={"ok": True}, status_code=200)
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=_PORT)
+    port = int(os.getenv("PORT", "7860"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

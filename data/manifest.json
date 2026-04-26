@@ -1,6 +1,7 @@
 {
   "task_1_easy": {
     "difficulty": "easy",
+    "tier": 2,
     "scenario_files": [
       "task_1_easy/scenario_1.json",
       "task_1_easy/scenario_2.json",
@@ -9,6 +10,7 @@
   },
   "task_2_medium": {
     "difficulty": "medium",
+    "tier": 2,
     "scenario_files": [
       "task_2_medium/scenario_1.json",
       "task_2_medium/scenario_2.json",
@@ -17,34 +19,11 @@
   },
   "task_3_hard": {
     "difficulty": "hard",
+    "tier": 2,
     "scenario_files": [
       "task_3_hard/scenario_1.json",
       "task_3_hard/scenario_2.json",
       "task_3_hard/scenario_3.json"
-    ]
-  },
-  "task_4_cascade_easy": {
-    "difficulty": "cascade_easy",
-    "max_steps": 15,
-    "scenario_files": [
-      "task_4_cascade_easy/scenario_1.json",
-      "task_4_cascade_easy/scenario_2.json"
-    ]
-  },
-  "task_5_cascade_medium": {
-    "difficulty": "cascade_medium",
-    "max_steps": 30,
-    "scenario_files": [
-      "task_5_cascade_medium/scenario_1.json",
-      "task_5_cascade_medium/scenario_2.json"
-    ]
-  },
-  "task_6_cascade_hard": {
-    "difficulty": "cascade_hard",
-    "max_steps": 60,
-    "scenario_files": [
-      "task_6_cascade_hard/scenario_1.json",
-      "task_6_cascade_hard/scenario_2.json"
     ]
   }
 }

@@ -1,0 +1,82 @@
+[
+  {
+    "sample_id": "t1_001",
+    "contract_name": "Master Service Agreement — TechCorp / ClientCo",
+    "question_category": "Force Majeure",
+    "question": "Is there a Force Majeure clause? If so, extract the verbatim sentence.",
+    "context": "The Service Provider shall not be liable for any failure or delay in performing its obligations where such failure or delay results from Force Majeure Events including but not limited to acts of God, natural disasters, war, terrorism, or government actions. Payment terms are Net 30 from invoice date. Late payments accrue interest at 1.5% per month. Each party agrees to hold all Confidential Information in strict confidence.",
+    "answer_text": "The Service Provider shall not be liable for any failure or delay in performing its obligations where such failure or delay results from Force Majeure Events including but not limited to acts of God, natural disasters, war, terrorism, or government actions.",
+    "has_answer": true,
+    "difficulty_note": "FM clause is first sentence; easy extraction"
+  },
+  {
+    "sample_id": "t1_002",
+    "contract_name": "Software License Agreement — DevCo / EnterpriseCorp",
+    "question_category": "Non-Compete",
+    "question": "Is there a Non-Compete clause? If so, extract the verbatim sentence.",
+    "context": "This Agreement shall be governed by the laws of the State of New York. Licensor grants Licensee a non-exclusive, non-transferable license to use the Software. In no event shall either party's liability exceed the fees paid in the twelve months preceding the claim.",
+    "answer_text": "No related clause.",
+    "has_answer": false,
+    "difficulty_note": "No non-compete exists; agent must correctly identify absence"
+  },
+  {
+    "sample_id": "t1_003",
+    "contract_name": "Employment Agreement — MegaCorp",
+    "question_category": "Termination",
+    "question": "What are the termination provisions? Extract the verbatim sentence.",
+    "context": "Employee shall be entitled to four weeks paid vacation per calendar year. Either party may terminate this Agreement upon thirty days written notice, or immediately for cause including gross misconduct, material breach, or insolvency. Base compensation shall be reviewed annually. Health benefits begin on the first day of employment.",
+    "answer_text": "Either party may terminate this Agreement upon thirty days written notice, or immediately for cause including gross misconduct, material breach, or insolvency.",
+    "has_answer": true,
+    "difficulty_note": "Termination clause is in the middle; requires reading past unrelated terms"
+  },
+  {
+    "sample_id": "t1_004",
+    "contract_name": "Supply Chain Agreement — ManufacturerCo / DistributorInc",
+    "question_category": "Indemnification",
+    "question": "Is there an indemnification clause? Extract the verbatim sentence.",
+    "context": "Manufacturer warrants that all goods supplied shall be free from defects in materials and workmanship for a period of twelve months from delivery. The Manufacturer shall indemnify, defend, and hold harmless the Distributor from and against any claims, damages, and expenses arising from defects in the Manufacturer's products. Title to goods passes upon full payment.",
+    "answer_text": "The Manufacturer shall indemnify, defend, and hold harmless the Distributor from and against any claims, damages, and expenses arising from defects in the Manufacturer's products.",
+    "has_answer": true,
+    "difficulty_note": "Indemnification clause surrounds by warranty language — tests precision"
+  },
+  {
+    "sample_id": "t1_005",
+    "contract_name": "Joint Venture Agreement — AlphaCo / BetaGroup",
+    "question_category": "Governing Law",
+    "question": "Which governing law applies? Extract the verbatim sentence.",
+    "context": "The parties agree to contribute capital as specified in Schedule A. Profits and losses shall be allocated 60% to AlphaCo and 40% to BetaGroup. All disputes arising from this Agreement shall be resolved by binding arbitration in London. This Agreement shall be construed and governed by the laws of England and Wales, without reference to conflicts of law principles.",
+    "answer_text": "This Agreement shall be construed and governed by the laws of England and Wales, without reference to conflicts of law principles.",
+    "has_answer": true,
+    "difficulty_note": "Governing law is near end; arbitration clause nearby could confuse lazy extraction"
+  },
+  {
+    "sample_id": "t1_006",
+    "contract_name": "Consulting Agreement — AdvisorLLC",
+    "question_category": "Intellectual Property",
+    "question": "Is there an intellectual property assignment clause? Extract it verbatim.",
+    "context": "Consultant shall invoice Client monthly. Payment is due within 15 business days of invoice receipt. Consultant shall maintain professional indemnity insurance of at least $1,000,000 per occurrence. All expenses must be pre-approved in writing.",
+    "answer_text": "No related clause.",
+    "has_answer": false,
+    "difficulty_note": "No IP clause; agent must resist over-extracting from invoice/insurance language"
+  },
+  {
+    "sample_id": "t1_007",
+    "contract_name": "Real Estate Lease — LandlordLLC / TenantCorp",
+    "question_category": "Assignment",
+    "question": "Can the tenant assign this lease? Extract the verbatim assignment restriction.",
+    "context": "Tenant shall pay base rent of $15,000 per month, payable in advance on the first day of each month. Tenant shall not assign, sublease, or otherwise transfer this Lease or any interest therein without the prior written consent of Landlord, which shall not be unreasonably withheld or conditioned. Tenant is responsible for all utilities.",
+    "answer_text": "Tenant shall not assign, sublease, or otherwise transfer this Lease or any interest therein without the prior written consent of Landlord, which shall not be unreasonably withheld or conditioned.",
+    "has_answer": true,
+    "difficulty_note": "Assignment clause is clear but agent must not extract rent payment terms instead"
+  },
+  {
+    "sample_id": "t1_008",
+    "contract_name": "Data Processing Agreement — CloudCo / DataController",
+    "question_category": "Data Protection",
+    "question": "What data protection obligations are specified? Extract the verbatim clause.",
+    "context": "Processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate: encryption of personal data, pseudonymisation, and measures to ensure ongoing confidentiality, integrity, availability and resilience of processing systems. Service levels are 99.9% uptime. Support is available 24/7.",
+    "answer_text": "Processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate: encryption of personal data, pseudonymisation, and measures to ensure ongoing confidentiality, integrity, availability and resilience of processing systems.",
+    "has_answer": true,
+    "difficulty_note": "Data protection clause is technical; agent must extract precisely without truncation"
+  }
+]

@@ -55,7 +55,7 @@ ENV_MODE     = os.getenv("ENV_MODE", "direct").lower()
 ENV_URL      = os.getenv("ENV_URL", "http://127.0.0.1:7860")
 DEBUG        = os.getenv("DEBUG", "false").lower() in ("true", "1", "yes")
 
-TEMPERATURE            = 0.1   # Low temp for deterministic legal analysis
+TEMPERATURE            = 0.2   # Slight temperature for diversity in legal analysis
 MAX_TOKENS             = 400
 LLM_MAX_RETRIES        = int(os.getenv("LLM_MAX_RETRIES", "5"))
 LLM_RETRY_BASE_SECONDS = float(os.getenv("LLM_RETRY_BASE_SECONDS", "2.0"))
@@ -67,6 +67,9 @@ ACTIVE_TIERS: List[int] = [int(t.strip()) for t in _TIERS_ENV.split(",") if t.st
 
 # Tier 2 task IDs (backward-compatible OpenEnv tasks)
 TIER2_TASKS = ["task_1_easy", "task_2_medium", "task_3_hard"]
+
+# Backward-compatibility alias expected by test_phase4
+TASKS = TIER2_TASKS
 
 ANALYSIS_TEMPLATE = textwrap.dedent(
     """\
@@ -141,6 +144,8 @@ RULES:
 - flags=[] if no issues. Otherwise: flags=["flag1","flag2"]
 - reasoning: 1-2 sentences maximum.
 - Do NOT add commentary outside the template.
+- Alternatively you may respond in JSON format with the same field names.
+  JSON format: {"clause_type":"...","risk_level":"...","flags":[...],"suggested_action":"...","reasoning":"..."}
 
 EXAMPLE (study this carefully):
 Clause: "The Vendor shall indemnify and hold harmless the Client from any and all claims, damages, losses, costs and expenses, including attorneys' fees, arising out of Vendor's performance."

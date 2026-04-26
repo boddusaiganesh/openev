@@ -201,7 +201,7 @@ Full systemic cascade. Compound shocks on Day 14–16. Force Majeure/insurance o
 
 ---
 
-## API Reference
+## API Endpoints
 
 All tiers accessible from port `7860`.
 

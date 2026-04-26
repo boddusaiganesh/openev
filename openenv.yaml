@@ -6,7 +6,7 @@
 # All 6 tiers, adversarial probes, and Legal IQ served from one process.
 # =============================================================================
 
-name: lexarena
+name: contract-clause-review
 version: "3.0.0"
 description: >
   LexArena is the first benchmark to evaluate AI agents across the complete
